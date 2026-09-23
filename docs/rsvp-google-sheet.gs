@@ -6,9 +6,13 @@
  * 3. Copy the Web app URL into the invitation's "RSVP link / Google Sheet endpoint" field and set
  *    "RSVP method" to "sheet".
  *
- * Each reply becomes a row: time · invitation · name · attending · guests · message.
+ * Each reply becomes a row: time · invitation · name · attending · guests · message, plus the
+ * Été design's dietary requirements · companions · song request (blank for other designs).
+ * Already using an older copy of this script? Paste this version and redeploy: the three new
+ * column headings are added to your existing sheet automatically.
  */
 const SHEET_NAME = 'RSVPs';
+const HEADERS = ['Received', 'Invitation', 'Name', 'Attending', 'Guests', 'Message', 'Dietary requirements', 'Companions', 'Song request'];
 
 function doPost(e) {
   const p = (e && e.parameter) || {};
@@ -20,6 +24,9 @@ function doPost(e) {
     p['contact[Attending]'] || '',
     Number(p['contact[Guests]'] || 0) || '',
     p['contact[Message]'] || '',
+    p['contact[Dietary requirements]'] || '',
+    p['contact[Companions]'] || '',
+    p['contact[Song request]'] || '',
   ]);
   // Shown only when a guest's browser has JavaScript turned off (the invitation normally stays on its own page).
   return HtmlService.createHtmlOutput(
@@ -34,9 +41,12 @@ function getSheet_() {
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) {
     sheet = ss.insertSheet(SHEET_NAME);
-    sheet.appendRow(['Received', 'Invitation', 'Name', 'Attending', 'Guests', 'Message']);
+    sheet.appendRow(HEADERS);
     sheet.setFrozenRows(1);
-    sheet.getRange('A1:F1').setFontWeight('bold');
   }
+  // Sheets made by an older version of this script have fewer columns: add the new headings.
+  const header = sheet.getRange(1, 1, 1, HEADERS.length);
+  if (header.getValues()[0].join('|') !== HEADERS.join('|')) header.setValues([HEADERS]);
+  header.setFontWeight('bold');
   return sheet;
 }

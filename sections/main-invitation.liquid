@@ -78,6 +78,29 @@
 {%- capture year_display -%}{% render 'inv-digits', value: year_num, lang: lang %}{%- endcapture -%}
 {%- capture time_display -%}{% render 'inv-digits', value: time_label, lang: lang %}{%- endcapture -%}
 
+{%- if design == 'ete' -%}
+  {%- comment -%} Été has its own page structure (from the "Summer Wedding" Canva design). {%- endcomment -%}
+  {%- render 'invitation-ete',
+    m: m,
+    s: s,
+    lang: lang,
+    dir: dir,
+    k: k,
+    p1: p1,
+    p2: p2,
+    names: names,
+    amp: amp,
+    i1: i1,
+    i2: i2,
+    ds: ds,
+    iso: iso,
+    rsvp_mode: rsvp_mode,
+    max_guests: max_guests,
+    show_envelope: show_envelope,
+    alt: alt,
+    is_demo: is_demo
+  -%}
+{%- else -%}
 <div
   class="inv inv--{{ design }}"
   lang="{{ lang }}"
@@ -412,6 +435,7 @@
     </footer>
   </div>
 </div>
+{%- endif -%}
 
 {% schema %}
 {

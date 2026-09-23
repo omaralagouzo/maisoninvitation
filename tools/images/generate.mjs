@@ -14,7 +14,8 @@
 //     brand-favicon-32.png, brand-apple-touch-icon.png
 //   brand/logo/png/                PNG exports of every logo SVG
 //
-// Usage: npm run images   (builds the preview first if needed)
+// Usage: npm run images                  (builds the preview first if needed)
+//        npm run images -- --only=ete     just these designs' product photos + share image
 import fs from 'node:fs';
 import http from 'node:http';
 import path from 'node:path';
@@ -28,18 +29,23 @@ const MEDIA = path.join(ROOT, 'tools/shopify-setup/media');
 const ASSETS = path.join(ROOT, 'assets');
 const SCREENS = path.join(ROOT, 'dist/screens');
 const LANGS = ['en', 'ar'];
-const SEAL = { ivoire: ['#A9824F', '#8C6A3E'], minuit: ['#C9A96A', '#A5864A'], jardin: ['#7D8B6A', '#65724F'], sable: ['#B5654A', '#95503A'] };
+const SEAL = { ivoire: ['#A9824F', '#8C6A3E'], minuit: ['#C9A96A', '#A5864A'], jardin: ['#7D8B6A', '#65724F'], sable: ['#B5654A', '#95503A'], ete: ['#B09576', '#937C67'] };
+// Where the "details" phone screen scrolls to (designs with their own page structure).
+const DETAILS = { ete: '.ete-celebrations' };
+const ONLY = (process.argv.find((a) => a.startsWith('--only=')) || '').slice(7).split(',').filter(Boolean);
+const designs = ONLY.length ? DESIGNS.filter((d) => ONLY.includes(d.handle)) : DESIGNS;
+if (!designs.length) throw new Error(`--only matched no design (have: ${DESIGNS.map((d) => d.handle).join(', ')})`);
 const LANG_LABEL = { en: 'English', ar: 'العربية' };
 
 fs.mkdirSync(MEDIA, { recursive: true });
 fs.mkdirSync(SCREENS, { recursive: true });
 
-if (!fs.existsSync(path.join(PREVIEW, 'pages/invitation/ivoire-en.html'))) {
+if (designs.some((d) => !fs.existsSync(path.join(PREVIEW, `pages/invitation/${d.handle}-en.html`)))) {
   execFileSync('node', [path.join(ROOT, 'tools/preview/build.mjs'), '--only=/pages/invitation'], { stdio: 'inherit' });
 }
 
 // ------------------------------------------------------------------ tiny static server
-const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.png': 'image/png' };
+const TYPES = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.jpg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 const server = http.createServer((req, res) => {
   const p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   const file = path.join(PREVIEW, p);
@@ -64,7 +70,7 @@ const hidePreviewBadge = () => page.addStyleTag({ content: '.pv-badge{display:no
 
 // ------------------------------------------------------------------ 1. screens
 const screens = {};
-for (const d of DESIGNS) {
+for (const d of designs) {
   for (const lang of LANGS) {
     const key = `${d.handle}-${lang}`;
     const out = (name) => path.join(SCREENS, `${key}-${name}.png`);
@@ -75,7 +81,7 @@ for (const d of DESIGNS) {
     await settle();
     await page.screenshot({ path: out('hero') });
 
-    await page.evaluate(() => document.querySelector('#InvDetails').scrollIntoView({ block: 'start', behavior: 'instant' }));
+    await page.evaluate((sel) => document.querySelector(sel).scrollIntoView({ block: 'start', behavior: 'instant' }), DETAILS[d.handle] || '#InvDetails');
     await settle(400);
     await page.screenshot({ path: out('details') });
 
@@ -142,7 +148,7 @@ async function render(html, out, { w = 1200, h = 1500, type = 'jpeg' } = {}) {
   await comp.screenshot({ path: out, type, ...(type === 'jpeg' ? { quality: 86 } : {}) });
 }
 
-for (const d of DESIGNS) {
+for (const d of designs) {
   for (const lang of LANGS) {
     const s = screens[`${d.handle}-${lang}`];
     await render(
@@ -183,7 +189,7 @@ for (const d of DESIGNS) {
 const toJpeg = async (png, out, w, h) =>
   render(`<!doctype html><body style="margin:0"><img src="file://${png}" style="display:block;width:${w}px;height:${h}px"></body>`, out, { w, h });
 
-{
+if (!ONLY.length) {
   // hero auto-scroll demo: 780px wide (2× of 390)
   for (const lang of LANGS) {
     const s = screens[`ivoire-${lang}`];
@@ -199,8 +205,21 @@ const toJpeg = async (png, out, w, h) =>
 // Maison mark (never the demo couple's initials), at link-preview size.
 {
   const share = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
-  for (const d of DESIGNS) {
+  for (const d of designs) {
     await share.goto(inviteUrl(d.handle, 'en', ''), { waitUntil: 'networkidle' });
+    if (d.handle === 'ete') {
+      // Été: the full-bleed paper envelope, the Maison mark in place of the monogram.
+      await share.addStyleTag({ content: '.pv-badge,.ete-envelope__hint{display:none!important}.ete-envelope__flap{animation:none!important}.ete-envelope__monogram svg{width:100%;height:auto;max-height:100%}' });
+      await share.evaluate((svg) => {
+        const mono = document.querySelector('.ete-envelope__monogram');
+        mono.innerHTML = svg;
+        Object.assign(mono.style, { left: '46.3%', width: '7.4%', top: '63.5%', color: '#937C67' });
+      }, markSvg.replace(/stroke="#1F1D1A"/g, 'stroke="currentColor"'));
+      await share.evaluate(() => document.fonts.ready);
+      await share.waitForTimeout(300);
+      await share.screenshot({ path: path.join(ASSETS, `invite-share-${d.handle}.jpg`), type: 'jpeg', quality: 86 });
+      continue;
+    }
     await share.addStyleTag({
       content: `.pv-badge,.inv-envelope__hint{display:none!important}
         .inv-envelope__env{animation:none!important;width:430px!important}
@@ -215,6 +234,13 @@ const toJpeg = async (png, out, w, h) =>
     await share.screenshot({ path: path.join(ASSETS, `invite-share-${d.handle}.jpg`), type: 'jpeg', quality: 86 });
   }
   await share.close();
+}
+
+if (ONLY.length) {
+  await browser.close();
+  server.close();
+  console.log('done (only: ' + ONLY.join(', ') + ')');
+  process.exit(0);
 }
 
 await render(

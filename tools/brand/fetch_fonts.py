@@ -27,6 +27,10 @@ FONTS = [
     ("pinyon", "Pinyon Script", "Pinyon+Script", {"latin"}, "fonts-invitation"),
     ("aref-ruqaa", "Aref Ruqaa", "Aref+Ruqaa:wght@400;700", {"arabic"}, "fonts-invitation"),
     ("reem-kufi", "Reem Kufi", "Reem+Kufi:wght@400..700", {"arabic"}, "fonts-invitation"),
+    # Été design (from the "Summer Wedding" Canva design): closest OFL matches to its three typefaces
+    ("arapey", "Arapey", "Arapey:ital@0;1", {"latin"}, "fonts-invitation"),
+    ("bellefair", "Bellefair", "Bellefair", {"latin"}, "fonts-invitation"),
+    ("muellerhoff", "Herr Von Muellerhoff", "Herr+Von+Muellerhoff", {"latin"}, "fonts-invitation"),
 ]
 PRELOAD = {"font-fraunces-latin-normal-300-700.woff2", "font-inter-latin-normal-300-700.woff2"}
 

@@ -19,6 +19,8 @@
       assign theme_color = '#FBFAF6'
     when 'sable'
       assign theme_color = '#EFE3D1'
+    when 'ete'
+      assign theme_color = '#FBF6F4'
     else
       assign theme_color = '#F7F3EC'
   endcase
@@ -65,6 +67,10 @@
     {% render 'fonts' %}
     {% render 'fonts-invitation' %}
     {{ 'invitation.css' | asset_url | stylesheet_tag }}
+    {%- if design == 'ete' -%}
+      {{ 'invitation-ete.css' | asset_url | stylesheet_tag }}
+      {{ 'ete-envelope.jpg' | asset_url | preload_tag: as: 'image' }}
+    {%- endif -%}
     <script>
       (function () {
         var d = document.documentElement, q = location.search;
@@ -74,6 +80,9 @@
       })();
     </script>
     <script src="{{ 'invitation.js' | asset_url }}" defer></script>
+    {%- if design == 'ete' -%}
+      <script src="{{ 'invitation-ete.js' | asset_url }}" defer></script>
+    {%- endif -%}
     {{ content_for_header }}
   </head>
   <body class="inv-body inv-body--{{ design }}">

@@ -79,6 +79,8 @@ explaining the difference. When the site is in Arabic, the Arabic tab is selecte
 
 ### Invitation pages
 
+* **Été** has its own markup (`snippets/invitation-ete.liquid`, rendered by the same section), styles
+  (`assets/invitation-ete.css`) and behaviour (`assets/invitation-ete.js`); see *The Été design* below.
 * One markup (`sections/main-invitation.liquid`), four skins (`assets/invitation.css`, CSS custom properties per
   design), ornaments in `snippets/invitation-ornament.liquid`.
 * All wording follows the **invitation's** language (`invitation.en.*` / `invitation.ar.*` keys exist in both
@@ -90,6 +92,30 @@ explaining the difference. When the site is in Arabic, the Arabic tab is selecte
   add-to-calendar (.ics + Google), directions, optional embedded map, programme timeline, note from the couple,
   RSVP (form / Google Sheet / WhatsApp / link / none), background music, share button, bilingual switch,
   `noindex`, and WhatsApp/iMessage preview (`og:` tags with the couple's names).
+
+### The Été design
+
+Built from the "Summer Wedding" Canva design: nine 1366 × 768 slides turned into one scrolling page.
+
+* **Scaling:** everything is sized in *design units* (`--u` in `invitation-ete.css`). Wide screens show the whole
+  slide; below about 1025 px the middle 620 units fill the screen and the left and right edges crop away, as the
+  design intends. Text has readable minimum sizes and sections grow when it needs room. Decorations are placed
+  with their Canva coordinates (`style="--x:…;--y:…;--w:…"`).
+* **Envelope:** the envelope photo is cut into the flap and the pocket along the flap's edge (`clip-path`). On
+  tap, `invitation.js` sets `is-opening`: the flap swings up and away, page two shows through the opening, and
+  the pocket drops off the bottom of the screen.
+* **Trees:** each tree pivots at its trunk and holds a pose for 1/10 s (cut-out / stop-motion feel), paused off
+  screen and for reduced motion.
+* **Countdown:** whole calendar days from the guest's today to the wedding date, counted up once on first view,
+  then refreshed every minute so it rolls over at midnight.
+* **Scratch to reveal:** a `<canvas>` of linen over the venue photo (`cover_photo`, or the design's photo),
+  under the lace frame. About half scratched away reveals the rest. Keyboard users get a "Reveal the venue" button.
+* **Fan:** scroll position → frame number. Built-in frames cut the still image into 16 pleats that fold onto the
+  top guard. With the theme setting *Été design → Fan animation frames* set to N, it plays `ete-fan-001.webp` …
+  `ete-fan-NNN.webp` from the theme's assets on a canvas instead, one frame per step of scroll.
+* **RSVP:** the same four delivery methods as the other designs, plus dietary requirements, companions (adult /
+  child, name + allergies, capped at *Max guests per reply* − 1) and a song request. Companions are sent as one
+  `Companions` field; `Guests` is 1 + companions.
 
 ## Homepage phone demo (spec §2 open decision)
 

@@ -200,7 +200,7 @@ const M_METAFIELD_DEFINITION_CREATE = gql`
 const DEFINITION_FIELDS = gql`
   id
   type
-  fieldDefinitions { key }
+  fieldDefinitions { key validations { name value } }
   capabilities {
     publishable { enabled }
     renderable { enabled }
@@ -501,6 +501,39 @@ async function invitationDefinition() {
     if (res.ok) {
       def = res.data.metaobjectDefinition;
       log.updated(`added field(s) to "${type}": ${keys}`);
+    }
+  }
+
+  // Choice lists that grew since the store was set up (e.g. a new design): add the new
+  // values, keeping any the store already has.
+  const current = new Map(def.fieldDefinitions.map((f) => [f.key, f.validations || []]));
+  const grown = INVITATION_DEFINITION.fields
+    .filter((f) => f.choices && current.has(f.key))
+    .map((f) => {
+      const validations = current.get(f.key);
+      const list = validations.find((v) => v.name === 'choices');
+      if (!list) return null;
+      const have = JSON.parse(list.value || '[]');
+      const add = f.choices.filter((c) => !have.includes(c));
+      if (!add.length) return null;
+      return {
+        key: f.key,
+        add,
+        validations: validations.map((v) => ({ name: v.name, value: v.name === 'choices' ? JSON.stringify([...have, ...add]) : v.value })),
+      };
+    })
+    .filter(Boolean);
+  if (grown.length) {
+    const summary = grown.map((g) => `${g.key} += ${g.add.join(', ')}`).join('; ');
+    const res = await mutate(
+      'metaobjectDefinitionUpdate',
+      M_DEFINITION_UPDATE,
+      { id: def.id, definition: { fieldDefinitions: grown.map((g) => ({ update: { key: g.key, validations: g.validations } })) } },
+      { label: `${type}: ${summary}`, dry: () => dryDefinition(INVITATION_DEFINITION.fields) },
+    );
+    if (res.ok) {
+      def = res.data.metaobjectDefinition;
+      log.updated(`updated choices on "${type}": ${summary}`);
     }
   }
   invitationDefinitionCache = def;

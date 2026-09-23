@@ -1,0 +1,637 @@
+/* ==========================================================================
+   Maison — Été (the "Summer Wedding" design). Loaded after invitation.css.
+
+   Each section is one 1366 × 768 slide of the original design. Sizes are in
+   design units: --u is how many CSS pixels one design pixel is worth.
+     · wide screens:   the whole slide fits the width (and roughly the height)
+     · narrow screens: the middle 620 units fill the screen, so the left and
+                       right edges crop away while the content stays centred
+   Text never shrinks below a readable minimum, and sections grow when it needs room.
+   ========================================================================== */
+
+.inv--ete {
+  --inv-bg: #FBF6F4;
+  --inv-ink: #6B573B;
+  --inv-muted: rgba(107, 87, 59, 0.62);
+  --inv-accent: #937C67;
+  --inv-soft: #F4ECE4;
+  --inv-line: rgba(147, 124, 103, 0.42);
+  --inv-font-ui: 'Arapey', 'IBM Plex Sans Arabic', Georgia, serif;
+  --ete-serif: 'Arapey', 'Amiri', Georgia, serif;
+  --ete-caps: 'Bellefair', 'Amiri', Georgia, serif;
+  --ete-script: 'Herr Von Muellerhoff', 'Aref Ruqaa', cursive;
+  --ete-title: #937C67;
+  --ete-text: #6B573B;
+  --ete-field: rgba(107, 87, 59, 0.42);
+  --ete-stripe: #FAF4EE;
+  /* Herr Von Muellerhoff runs wider than the design's script, so it is set a little smaller. */
+  --ete-script-scale: 0.8;
+  --u: max(min(100vw / 1366, 100vh / 720), min(100vw / 620, 0.75px));
+  --s: var(--u);
+  background: var(--inv-bg);
+  color: var(--ete-text);
+  font-family: var(--ete-serif);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+@supports (height: 100svh) {
+  .inv--ete { --u: max(min(100vw / 1366, 100svh / 720), min(100vw / 620, 0.75px)); }
+}
+@media (min-width: 700px) {
+  .inv.inv--ete { background: var(--inv-bg); }
+}
+body.inv-body--ete { background: #FBF6F4; }
+.inv--ete[lang='ar'] { --ete-script-scale: 0.62; line-height: 1.7; }
+.inv--ete :focus-visible { outline: 2px solid var(--ete-title); outline-offset: 3px; }
+:where(.inv--ete) p { margin: 0; }
+/* Full-width design: the language and music pills sit at the screen edge. */
+.inv--ete .inv-controls { inset-inline-end: max(14px, env(safe-area-inset-right)); }
+
+/* ------------------------------------------------------------------ type */
+.ete-title,
+.ete-kicker {
+  margin: 0;
+  font-family: var(--ete-serif);
+  font-size: max(calc(46.7 * var(--u)), 28px);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.13;
+  color: var(--ete-title);
+}
+.ete-caps {
+  font-family: var(--ete-caps);
+  font-weight: 400;
+  letter-spacing: 0.218em;
+  text-transform: uppercase;
+  line-height: 1.06;
+}
+.ete-script {
+  font-family: var(--ete-script);
+  font-weight: 400;
+  line-height: 1.2;
+}
+.inv--ete[lang='ar'] :is(.ete-title, .ete-kicker) { font-style: normal; line-height: 1.5; }
+.inv--ete[lang='ar'] .ete-caps { letter-spacing: 0; text-transform: none; line-height: 1.5; }
+
+/* ------------------------------------------------------------------ layout helpers */
+.ete-page { position: relative; }
+.ete-slide {
+  position: relative;
+  min-height: calc(768 * var(--u));
+  overflow: hidden;
+  text-align: center;
+  isolation: isolate;
+}
+/* Decorations placed by their design coordinates: --x (left), --y (top) or --b (bottom), --w (width). */
+.ete-abs {
+  position: absolute;
+  z-index: -1;
+  left: calc(50% + (var(--x) - 683) * var(--s));
+  width: calc(var(--w) * var(--s));
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.ete-abs--top { top: calc(var(--y) * var(--s)); }
+.ete-abs--bottom { bottom: calc(var(--b) * var(--s)); }
+
+/* ------------------------------------------------------------------ 1 · envelope */
+.ete-envelope {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+.inv-embed .ete-envelope,
+.inv-skip-envelope .ete-envelope,
+.inv.is-open .ete-envelope { opacity: 0; visibility: hidden; pointer-events: none; }
+.ete-envelope__open {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+/* The envelope photo always covers the screen; its centre (the flap tip and monogram) stays in view. */
+.ete-envelope__stage {
+  --stage-w: max(100vw, 100vh * 1366 / 768);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--stage-w);
+  aspect-ratio: 1366 / 768;
+  transform: translate(-50%, -50%);
+  perspective: calc(var(--stage-w) * 1.4);
+  perspective-origin: 50% 0;
+}
+.ete-envelope__pocket,
+.ete-envelope__flap-front,
+.ete-envelope__flap-back {
+  position: absolute;
+  inset: 0;
+  background-size: 100% 100%;
+}
+.ete-envelope__pocket {
+  clip-path: polygon(0% 15.49%, 45.86% 78.46%, 46.56% 79.32%, 47.31% 80.04%, 48.10% 80.60%, 48.92% 81.00%, 49.76% 81.24%, 50.61% 81.31%, 51.46% 81.22%, 52.30% 80.96%, 53.11% 80.54%, 53.90% 79.96%, 54.64% 79.22%, 55.34% 78.35%, 100% 15.27%, 100% 100%, 0% 100%);
+  transition: transform 1.35s cubic-bezier(0.55, 0, 0.75, 0.25) 0.85s;
+}
+.ete-envelope__flap {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+  animation: ete-flap-peek 5s ease-in-out 1.2s infinite;
+  transition: transform 1.05s cubic-bezier(0.5, 0.05, 0.3, 1), opacity 0.3s linear 0.8s;
+}
+.ete-envelope__flap-front,
+.ete-envelope__flap-back {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+.ete-envelope__flap-front {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 15.27%, 55.34% 78.35%, 54.64% 79.22%, 53.90% 79.96%, 53.11% 80.54%, 52.30% 80.96%, 51.46% 81.22%, 50.61% 81.31%, 49.76% 81.24%, 48.92% 81.00%, 48.10% 80.60%, 47.31% 80.04%, 46.56% 79.32%, 45.86% 78.46%, 0% 15.49%);
+}
+/* The lining, seen once the flap has swung past upright (mirrored shape, turned over). */
+.ete-envelope__flap-back {
+  transform: rotateX(180deg);
+  background: linear-gradient(180deg, #EEE9E1, #F6F2EC 70%);
+  clip-path: polygon(0% 100%, 100% 100%, 100% 84.73%, 55.34% 21.65%, 54.64% 20.78%, 53.90% 20.04%, 53.11% 19.46%, 52.30% 19.04%, 51.46% 18.78%, 50.61% 18.69%, 49.76% 18.76%, 48.92% 19.00%, 48.10% 19.40%, 47.31% 19.96%, 46.56% 20.68%, 45.86% 21.54%, 0% 84.51%);
+}
+.ete-envelope__monogram {
+  position: absolute;
+  left: 37.63%;
+  top: 60.8%;
+  width: 24.67%;
+  font-family: var(--ete-script);
+  font-size: calc(var(--stage-w, 100vw) * 0.0597 * var(--ete-script-scale));
+  line-height: 1.2;
+  text-align: center;
+  color: var(--ete-title);
+  white-space: nowrap;
+}
+.ete-envelope__hint {
+  position: absolute;
+  left: 50%;
+  bottom: max(26px, 7vh);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  font-family: var(--ete-serif);
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  color: var(--ete-title);
+  white-space: nowrap;
+  transition: opacity 0.4s;
+}
+.inv--ete[lang='ar'] .ete-envelope__hint { font-style: normal; letter-spacing: 0; }
+.ete-envelope__open:focus-visible .ete-envelope__hint { outline: 2px solid var(--ete-title); outline-offset: 2px; }
+.ete-envelope__hint-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ete-title); animation: inv-pulse 2s ease-in-out infinite; }
+@keyframes ete-flap-peek {
+  0%, 72%, 100% { transform: rotateX(0deg); }
+  82% { transform: rotateX(7deg); }
+  90% { transform: rotateX(1deg); }
+}
+@media (hover: hover) {
+  .ete-envelope__open:hover .ete-envelope__flap { animation: none; transform: rotateX(6deg); transition-duration: 0.5s; }
+}
+.inv.is-opening .ete-envelope__flap { animation: none; transform: rotateX(180deg); opacity: 0; }
+.inv.is-opening .ete-envelope__pocket { transform: translateY(108%); }
+.inv.is-opening .ete-envelope__hint { opacity: 0; }
+
+/* ------------------------------------------------------------------ 2 · hero */
+.ete-hero {
+  --g: var(--u);
+  --s: var(--g);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ete-hero__text {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  padding: calc(28 * var(--u)) 16px 0;
+}
+.ete-names {
+  margin: calc(14 * var(--u)) 0 0;
+  font-family: var(--ete-script);
+  font-size: max(calc(81.5 * var(--u) * var(--ete-script-scale)), 42px);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ete-title);
+}
+.ete-hero__date { margin-top: calc(13 * var(--u)); font-size: max(calc(32.4 * var(--u)), 18px); color: var(--ete-title); }
+.ete-hero__scene { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.ete-tree { transform-origin: 50% 97%; transform: rotate(var(--r, 0deg)); will-change: transform; }
+/* Phones: a full screen, the garden a little larger and anchored at the bottom, the words centred above it. */
+@media (max-width: 699px) {
+  .ete-hero {
+    --g: calc(var(--u) * 1.25);
+    min-height: 100vh;
+    min-height: 100svh;
+    padding-bottom: calc(508 * var(--g));
+    justify-content: center;
+  }
+  .ete-hero__text { padding-block: 32px 12px; }
+}
+
+/* ------------------------------------------------------------------ 3 · countdown */
+.ete-countdown__num {
+  position: relative;
+  padding-top: calc(77 * var(--u));
+  font-size: max(calc(46.7 * var(--u)), 30px);
+  color: var(--ete-title);
+  font-variant-numeric: lining-nums;
+}
+.ete-countdown__label { position: relative; margin-top: calc(21 * var(--u)); text-transform: uppercase; }
+.inv--ete[lang='ar'] .ete-countdown__label { text-transform: none; }
+
+/* ------------------------------------------------------------------ 4 · scratch to reveal */
+.ete-venue { padding: calc(49 * var(--u)) 16px calc(55 * var(--u)); }
+.ete-scratch {
+  position: relative;
+  width: calc(520.3 * var(--u));
+  max-width: calc(100vw - 24px);
+  aspect-ratio: 1200 / 912;
+  margin: calc(54 * var(--u)) auto 0;
+}
+.ete-scratch__window {
+  position: absolute;
+  left: 10.3%;
+  top: 14.5%;
+  width: 80%;
+  height: 71%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #EDE6DC;
+}
+.ete-scratch__photo { display: block; width: 100%; height: 100%; object-fit: cover; }
+.ete-scratch__cover {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: grab;
+  transition: opacity 0.9s ease;
+}
+.ete-scratch__cover:active { cursor: grabbing; }
+.ete-scratch.is-revealed .ete-scratch__cover { opacity: 0; pointer-events: none; }
+.ete-scratch__frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+/* A sheen sweeps across the linen until the first scratch, so it reads as something to rub away. */
+.ete-scratch__window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
+  transform: translateX(-130%);
+  animation: ete-shine 4.2s ease-in-out 1.5s infinite;
+}
+.ete-scratch:not(.is-ready) .ete-scratch__window::after,
+.ete-scratch.is-touched .ete-scratch__window::after,
+.ete-scratch.is-revealed .ete-scratch__window::after { display: none; }
+@keyframes ete-shine { 0% { transform: translateX(-130%); } 45%, 100% { transform: translateX(130%); } }
+.ete-scratch__reveal {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  translate: -50% 100%;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--inv-bg);
+  font-family: var(--ete-serif);
+  font-size: 1rem;
+  color: var(--ete-title);
+  opacity: 0;
+  pointer-events: none;
+}
+.ete-scratch__reveal:focus-visible { opacity: 1; pointer-events: auto; }
+.ete-scratch.is-revealed .ete-scratch__reveal, .ete-scratch:not(.is-ready) .ete-scratch__reveal { display: none; }
+.ete-venue__name {
+  width: min(100%, max(calc(380 * var(--u)), 260px));
+  margin: calc(44.6 * var(--u)) auto 0;
+  font-size: max(calc(32.4 * var(--u)), 19px);
+  color: var(--ete-title);
+}
+.ete-venue__place {
+  margin-top: calc(16 * var(--u));
+  font-size: max(calc(26.7 * var(--u)), 17px);
+  font-style: italic;
+  color: var(--ete-title);
+}
+.inv--ete[lang='ar'] .ete-venue__place { font-style: normal; }
+
+/* ------------------------------------------------------------------ 5–6 · celebrations */
+.ete-celebrations {
+  position: relative;
+  padding: calc(49 * var(--u)) 16px calc(148 * var(--u));
+  text-align: center;
+  background-color: var(--inv-bg);
+  background-image: repeating-linear-gradient(90deg, var(--ete-stripe) 0 calc(12.24 * var(--u)), transparent 0 calc(23.71 * var(--u)));
+}
+.ete-celebrations > .ete-title { margin-bottom: calc(46 * var(--u)); }
+.ete-card {
+  position: relative;
+  width: min(calc(546 * var(--u)), 100%);
+  margin-inline: auto;
+  border-radius: calc(109 * var(--u));
+  background: #EFE9DF url('ete-linen.jpg') center / cover;
+  color: var(--ete-text);
+}
+.ete-event {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  min-height: calc(543 * var(--u));
+  padding: calc(54 * var(--u)) max(calc(24 * var(--u)), 14px) calc(29 * var(--u));
+}
+.ete-event + .ete-event { margin-top: calc(154 * var(--u)); }
+.ete-event__title {
+  margin: 0;
+  font-family: var(--ete-serif);
+  font-size: max(calc(46.7 * var(--u)), 26px);
+  font-weight: 400;
+  line-height: 1.13;
+  text-transform: uppercase;
+}
+.ete-event__venue {
+  margin-top: calc(44 * var(--u));
+  font-size: max(calc(81.5 * var(--u) * var(--ete-script-scale)), 38px);
+  text-wrap: balance;
+}
+.ete-event__date { margin-top: calc(41 * var(--u)); font-size: max(calc(32.4 * var(--u)), 18px); }
+.ete-event__time {
+  display: inline-flex;
+  align-items: center;
+  gap: max(calc(18 * var(--u)), 10px);
+  margin-top: calc(10.7 * var(--u));
+  font-size: max(calc(32.4 * var(--u)), 18px);
+}
+.ete-event__time img { width: max(calc(35 * var(--u)), 22px); height: auto; }
+.ete-event__map {
+  margin-top: calc(47 * var(--u));
+  padding-block: 2px;
+  font-family: var(--ete-serif);
+  font-size: max(calc(32 * var(--u)), 18px);
+  line-height: 1.13;
+  text-transform: uppercase;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(107, 87, 59, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+  transition: text-decoration-color 0.25s, color 0.25s;
+}
+.ete-event__map:hover { color: var(--ete-title); text-decoration-color: currentColor; }
+.inv--ete[lang='ar'] :is(.ete-event__title, .ete-event__map) { text-transform: none; }
+.ete-event__note { margin-top: calc(2 * var(--u)); font-size: max(calc(46.7 * var(--u) * var(--ete-script-scale)), 26px); }
+
+/* ------------------------------------------------------------------ 7 · timeline + fan */
+.ete-timeline { padding: calc(49 * var(--u)) 16px calc(40 * var(--u)); }
+.ete-timeline > .ete-title { margin-bottom: calc(91 * var(--u)); }
+.ete-timeline__list {
+  --tl-time: calc(170 * var(--u));
+  --tl-label: calc(292 * var(--u));
+  position: relative;
+  z-index: 1;
+  inset-inline-start: calc(39.5 * var(--u));
+  width: calc(463 * var(--u));
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+.ete-timeline__item { display: grid; grid-template-columns: var(--tl-time) var(--tl-label); }
+.ete-timeline__time,
+.ete-timeline__label {
+  padding-block: calc(22.25 * var(--u));
+  font-size: max(calc(15.6 * var(--u)), 14px);
+  letter-spacing: 0.1em;
+  line-height: 1.4;
+  color: var(--ete-title);
+}
+.ete-timeline__time { padding-inline-end: calc(37 * var(--u)); text-align: end; line-height: 1.25; align-self: stretch; }
+.ete-timeline__label { padding-inline-start: calc(36 * var(--u)); border-inline-start: 1px solid #3D3B3A; text-align: start; }
+.ete-timeline__item:first-child > * { padding-block-start: calc(18 * var(--u)); }
+.ete-timeline__item:last-child > * { padding-block-end: calc(19 * var(--u)); }
+.inv--ete[lang='ar'] :is(.ete-timeline__time, .ete-timeline__label) { letter-spacing: 0; }
+
+.ete-fan {
+  position: absolute;
+  z-index: 0;
+  left: calc(50% + (859.7 - 683) * var(--u));
+  top: calc(4 * var(--u));
+  width: calc(527.6 * var(--u));
+  aspect-ratio: 960 / 1361;
+  pointer-events: none;
+  user-select: none;
+}
+.ete-fan__img, .ete-fan__piece, .ete-fan__canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ete-fan__piece {
+  transform-origin: 75.65% 51.89%;
+  transform: rotate(calc(var(--k, 0) * (1 - var(--p, 1)) * 1deg));
+}
+.ete-fan.is-animated .ete-fan__img { visibility: hidden; }
+.ete-fan.is-animated.is-open .ete-fan__img { visibility: visible; }
+.ete-fan.is-animated.is-open .ete-fan__piece { visibility: hidden; }
+.ete-fan.has-frames .ete-fan__img, .ete-fan.has-frames .ete-fan__piece { display: none; }
+[dir='rtl'] .ete-fan { left: auto; right: calc(50% + (859.7 - 683) * var(--u)); transform: scaleX(-1); }
+
+/* Below 900px the fan moves under the timeline and opens in from the edge of the screen. */
+@media (max-width: 899px) {
+  .ete-timeline__list {
+    --tl-time: 38%;
+    --tl-label: 62%;
+    inset-inline-start: 0;
+    width: min(100%, 420px);
+  }
+  .ete-timeline__time { padding-inline-end: 20px; }
+  .ete-timeline__label { padding-inline-start: 20px; }
+  .ete-fan {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: min(74vw, 400px);
+    margin: 28px -7vw 0 auto;
+  }
+  [dir='rtl'] .ete-fan { right: auto; margin: 28px auto 0 -7vw; }
+}
+
+/* ------------------------------------------------------------------ 8 · gifts */
+.ete-gifts { padding: calc(77 * var(--u)) 16px calc(90 * var(--u)); }
+.ete-gifts__envelope { display: block; width: max(calc(229.6 * var(--u)), 140px); height: auto; margin-inline: auto; }
+.ete-gifts__card {
+  margin-top: calc(54 * var(--u));
+  padding: calc(20 * var(--u)) max(calc(52 * var(--u)), 20px) calc(51 * var(--u));
+  border-radius: calc(109 * var(--u)) / calc(70 * var(--u));
+}
+.ete-gifts__text {
+  max-width: 441px;
+  max-width: max(calc(441 * var(--u)), 0px);
+  margin: calc(41 * var(--u)) auto 0;
+  font-size: max(calc(26.7 * var(--u)), 17px);
+  line-height: 1.4;
+}
+
+/* ------------------------------------------------------------------ 9 · RSVP */
+.ete-rsvp { padding: calc(49 * var(--u)) 16px calc(64 * var(--u)); }
+.ete-rsvp > .ete-title { margin-bottom: calc(39 * var(--u)); }
+.ete-rsvp__deadline { margin: calc(-20 * var(--u)) 0 calc(20 * var(--u)); font-size: max(calc(21.3 * var(--u)), 16px); font-style: italic; color: var(--ete-title); }
+.ete-rsvp__body { position: relative; z-index: 1; width: min(calc(539 * var(--u)), 100%); margin-inline: auto; text-align: start; }
+@media (max-width: 899px) { .ete-rsvp__vase { display: none; } }
+.ete-form { display: grid; }
+.ete-field { margin: 0; margin-top: max(calc(18 * var(--u)), 16px); padding: 0; border: 0; min-width: 0; }
+.ete-field.ete-choice { margin-top: 0; }
+.ete-field > label,
+.ete-field > legend,
+.ete-field__label {
+  display: block;
+  margin-bottom: max(calc(9 * var(--u)), 6px);
+  padding: 0;
+  font-size: max(calc(21.3 * var(--u)), 17px);
+  line-height: 1.4;
+  color: var(--ete-text);
+}
+.ete-field__hint { font-size: max(calc(21.3 * var(--u)), 16px); line-height: 1.4; color: rgba(107, 87, 59, 0.55); }
+.ete-choice > label {
+  display: flex;
+  align-items: center;
+  gap: max(calc(13 * var(--u)), 10px);
+  width: fit-content;
+  min-height: max(calc(23 * var(--u)), 28px);
+  font-size: max(calc(21.3 * var(--u)), 17px);
+  line-height: 1.2;
+  cursor: pointer;
+}
+.ete-choice input {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: none;
+  width: max(calc(17 * var(--u)), 16px);
+  height: max(calc(17 * var(--u)), 16px);
+  margin: 0;
+  border: 1.5px solid var(--ete-text);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.ete-choice input:checked { background: radial-gradient(circle, var(--ete-text) 0 38%, transparent 44%); }
+.ete-form input[type='text'],
+.ete-form input[type='email'] {
+  display: block;
+  width: min(calc(511 * var(--u)), 100%);
+  height: max(calc(50 * var(--u)), 46px);
+  padding: 0 max(calc(12 * var(--u)), 12px);
+  border: 2px solid var(--ete-field);
+  border-radius: max(calc(12 * var(--u)), 10px);
+  background: rgba(255, 255, 255, 0.35);
+  font: inherit;
+  font-size: max(calc(18 * var(--u)), 16px);
+  color: var(--ete-text);
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.ete-form input::placeholder { color: rgba(107, 87, 59, 0.5); opacity: 1; }
+.ete-form input[type='text']:focus,
+.ete-form input[type='email']:focus { outline: none; border-color: var(--ete-title); background: rgba(255, 255, 255, 0.6); }
+.ete-form input[type='email'] { text-align: start; }
+.ete-rsvp__attending { display: grid; }
+.ete-companions .ete-field__hint { margin-top: max(calc(18 * var(--u)), 4px); }
+.ete-companions__list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.ete-companions__list:not(:empty) { margin-top: 14px; }
+.ete-companion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px 10px;
+  align-items: end;
+  width: min(calc(511 * var(--u)), 100%);
+}
+.ete-companion__label { grid-column: 1 / -1; font-size: max(calc(18 * var(--u)), 15px); font-style: italic; color: var(--ete-title); }
+.inv--ete .ete-companion input[type='text'] { width: 100%; height: max(calc(44 * var(--u)), 42px); }
+.ete-companion__remove {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: max(calc(44 * var(--u)), 42px);
+  border: 2px solid var(--ete-field);
+  border-radius: max(calc(12 * var(--u)), 10px);
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--ete-title);
+}
+.ete-companion__remove:hover { border-color: var(--ete-title); }
+@media (max-width: 520px) {
+  .ete-companion { grid-template-columns: minmax(0, 1fr) auto; }
+  .ete-companion input[data-field='allergies'] { grid-column: 1; grid-row: 3; }
+  .ete-companion__remove { grid-row: 2 / 4; grid-column: 2; height: auto; }
+}
+.ete-companions__add { display: flex; flex-wrap: wrap; gap: max(calc(16 * var(--u)), 10px); margin-top: max(calc(18 * var(--u)), 12px); }
+.ete-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: max(calc(121 * var(--u)), 104px);
+  height: max(calc(50 * var(--u)), 46px);
+  padding: 0 max(calc(12 * var(--u)), 12px);
+  border: 2px solid var(--ete-field);
+  border-radius: max(calc(12 * var(--u)), 10px);
+  font-family: var(--ete-serif);
+  font-size: max(calc(18 * var(--u)), 16px);
+  color: rgba(107, 87, 59, 0.78);
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+}
+.ete-chip:hover:not(:disabled) { border-color: var(--ete-title); color: var(--ete-text); background: rgba(255, 255, 255, 0.4); }
+.ete-chip:disabled { opacity: 0.45; cursor: not-allowed; }
+.ete-companions__max { margin-top: 8px; font-size: 0.95rem; }
+.ete-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: min(calc(511 * var(--u)), 100%);
+  min-height: max(calc(54 * var(--u)), 50px);
+  margin-top: max(calc(32 * var(--u)), 24px);
+  padding: 10px 20px;
+  border-radius: max(calc(12 * var(--u)), 10px);
+  background: var(--ete-title);
+  font-family: var(--ete-serif);
+  font-size: max(calc(21.3 * var(--u)), 17px);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #FBF6F4;
+  transition: background-color 0.25s;
+}
+.inv--ete .ete-submit { color: #FBF6F4; }
+.ete-submit:hover { background: var(--ete-text); }
+.ete-submit:disabled { opacity: 0.6; cursor: progress; }
+.inv--ete[lang='ar'] .ete-submit { letter-spacing: 0; }
+.ete-rsvp__thanks,
+.ete-rsvp__error {
+  margin-top: 18px;
+  font-size: max(calc(24 * var(--u)), 18px);
+  font-style: italic;
+  line-height: 1.4;
+  text-align: center;
+  color: var(--ete-title);
+}
+.ete-rsvp__error { font-style: normal; font-size: 1rem; color: #9B3D2E; }
+
+/* ------------------------------------------------------------------ footer */
+.ete-footer { display: grid; justify-items: center; gap: 16px; padding: 24px 16px 56px; text-align: center; }
+.ete-footer__names { font-size: 3.2rem; line-height: 1; color: var(--ete-title); }
+.ete-footer__closing { font-size: 1.2rem; font-style: italic; color: var(--ete-title); }
+.inv--ete .inv-footer__credit { font-family: var(--ete-serif); font-size: 0.85rem; letter-spacing: 0.04em; }
+
+/* ------------------------------------------------------------------ motion */
+@media (prefers-reduced-motion: reduce) {
+  .ete-tree { transform: none; }
+}

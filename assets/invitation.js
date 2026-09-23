@@ -24,7 +24,9 @@
   const musicToggle = root.querySelector('[data-music-toggle]');
   const skipEnvelope = !envelope || html.classList.contains('inv-embed') || html.classList.contains('inv-skip-envelope');
 
-  const heroItems = [...root.querySelectorAll('.inv-hero [data-inv-reveal]')];
+  // The hero reveals as the envelope opens; designs mark theirs .inv-hero or [data-inv-hero].
+  const HERO = '.inv-hero, [data-inv-hero]';
+  const heroItems = [...root.querySelectorAll('.inv-hero [data-inv-reveal], [data-inv-hero] [data-inv-reveal]')];
   heroItems.forEach((el, i) => el.style.setProperty('--i', i));
 
   const finishOpen = () => {
@@ -234,7 +236,7 @@
   });
 
   /* ---------------------------------------------------------------- reveal */
-  const targets = [...root.querySelectorAll('[data-inv-reveal]')].filter((el) => !el.closest('.inv-hero'));
+  const targets = [...root.querySelectorAll('[data-inv-reveal]')].filter((el) => !el.closest(HERO));
   if (!reduceMotion && 'IntersectionObserver' in window && !html.classList.contains('inv-embed')) {
     const io = new IntersectionObserver(
       (entries) =>

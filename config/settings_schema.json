@@ -170,6 +170,17 @@
         "id": "invitation_envelope",
         "label": "Open invitations with the envelope animation",
         "default": true
+      },
+      {
+        "type": "header",
+        "content": "Été design"
+      },
+      {
+        "type": "number",
+        "id": "ete_fan_frames",
+        "label": "Fan animation frames",
+        "info": "0 = the built-in fan animation. For a frame-by-frame animation, upload the frames to the theme's assets as ete-fan-001.webp, ete-fan-002.webp, … and enter how many there are. Scrolling steps through them one frame at a time.",
+        "default": 0
       }
     ]
   }

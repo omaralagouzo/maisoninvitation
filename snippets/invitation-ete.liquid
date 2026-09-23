@@ -1,0 +1,416 @@
+{%- comment -%}
+  Été — the "Summer Wedding" design. Rendered by sections/main-invitation.liquid when the
+  invitation's design is "ete". Every section follows one 1366 × 768 slide of the original
+  Canva design; decorations are placed in design units (--u, see invitation-ete.css) and
+  centred, so on narrow screens the left and right edges crop away and the middle stays.
+
+  Behaviour: assets/invitation.js (envelope timing, RSVP sending, share, reveal) plus
+  assets/invitation-ete.js (swaying trees, day countdown, scratch card, scroll-driven fan,
+  companions).
+
+  Params: m, s (section settings), lang, dir, k (translation prefix), p1, p2, names, amp,
+  i1, i2, ds (event date), iso, rsvp_mode, max_guests, show_envelope, alt, is_demo
+{%- endcomment -%}
+{%- liquid
+  assign intro = m.intro_line.value | default: ''
+  if intro == blank
+    assign intro = k | append: 'getting_married' | t
+  endif
+
+  if lang == 'ar'
+    capture date_display
+      render 'inv-date', date: ds, lang: lang, weekday: false
+    endcapture
+  else
+    assign date_display = ds | date: '%B %-d, %Y'
+  endif
+
+  assign now_s = 'now' | date: '%s' | plus: 0
+  assign event_s = ds | date: '%s' | plus: 0
+  assign days_left = event_s | minus: now_s | divided_by: 86400.0 | ceil
+  if days_left < 0
+    assign days_left = 0
+  endif
+
+  assign venue_photo = m.cover_photo.value
+  assign companions_max = max_guests | minus: 1
+  if companions_max < 0
+    assign companions_max = 0
+  endif
+  assign fan_frames = settings.ete_fan_frames | default: 0 | plus: 0
+-%}
+
+<div
+  class="inv inv--ete"
+  lang="{{ lang }}"
+  dir="{{ dir }}"
+  data-invitation
+  data-lang="{{ lang }}"
+  data-date="{{ iso }}"
+  data-names="{{ names | escape }}"
+  data-title="{{ k | append: 'wedding_of' | t: names: names }}"
+  data-venue="{{ m.venue_name.value | escape }}{% if m.venue_address.value != blank %}, {{ m.venue_address.value | newline_to_br | replace: '<br />', ', ' | strip_newlines | escape }}{% endif %}"
+  data-demo="{{ is_demo }}"
+>
+  {%- comment -%} 1 · The envelope: tap and the flap lifts, then the envelope drops away onto the next page. {%- endcomment -%}
+  {%- if show_envelope -%}
+    <div class="ete-envelope" data-envelope>
+      <div class="ete-envelope__open" data-envelope-open role="button" tabindex="0" aria-label="{{ k | append: 'tap_to_open' | t }}">
+        <div class="ete-envelope__stage">
+          <div class="ete-envelope__pocket" style="background-image: url({{ 'ete-envelope.jpg' | asset_url }})"></div>
+          <div class="ete-envelope__flap">
+            <div class="ete-envelope__flap-front" style="background-image: url({{ 'ete-envelope.jpg' | asset_url }})">
+              <span class="ete-envelope__monogram" aria-hidden="true">{{ i1 }} {{ i2 }}</span>
+            </div>
+            <div class="ete-envelope__flap-back"></div>
+          </div>
+        </div>
+        <p class="ete-envelope__hint">
+          <span class="ete-envelope__hint-dot" aria-hidden="true"></span>
+          {{ k | append: 'tap_to_open' | t }}
+        </p>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="ete-page">
+    <div class="inv-controls">
+      {%- if alt -%}
+        <a class="inv-pill" href="{{ alt.system.url }}{% if show_envelope %}?open=1{% endif %}" hreflang="{{ alt.language.value }}" lang="{{ alt.language.value }}">
+          {{- k | append: 'switch_language' | t -}}
+        </a>
+      {%- endif -%}
+      {%- if m.music_url.value != blank -%}
+        <button type="button" class="inv-pill inv-pill--icon" data-music-toggle aria-pressed="false" aria-label="{{ 'accessibility.play_music' | t }}">
+          {% render 'icon', name: 'music', size: 18, class: 'inv-music-on' %}
+          {% render 'icon', name: 'music-off', size: 18, class: 'inv-music-off' %}
+        </button>
+        <audio src="{{ m.music_url.value }}" loop preload="none" data-music></audio>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} 2 · Names, date and the garden: the trees sway like paper cut-outs. {%- endcomment -%}
+    <header class="ete-slide ete-hero" data-inv-hero>
+      <div class="ete-hero__text">
+        <p class="ete-kicker" data-inv-reveal>{{ intro | escape | newline_to_br }}</p>
+        <h1 class="ete-names" data-inv-reveal>
+          <span>{{ p1 }}</span> <span class="ete-names__amp">{{ amp }}</span> <span>{{ p2 }}</span>
+        </h1>
+        <p class="ete-caps ete-hero__date" data-inv-reveal>{{ date_display }}</p>
+      </div>
+      <div class="ete-hero__scene" aria-hidden="true" data-ete-garden>
+        {%- liquid
+          assign cp = 'ete-centerpiece.webp' | asset_url
+          assign t1 = 'ete-tree-1.webp' | asset_url
+          assign t2 = 'ete-tree-2.webp' | asset_url
+          assign t3 = 'ete-tree-3.webp' | asset_url
+          assign t4 = 'ete-tree-4.webp' | asset_url
+          assign t5 = 'ete-tree-5.webp' | asset_url
+        -%}
+        <img class="ete-abs ete-abs--bottom" src="{{ cp }}" alt="" width="580" height="1292" style="--x:580;--b:-15;--w:234.7" fetchpriority="high">
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t5 }}" alt="" width="185" height="698" style="--x:821;--b:3.3;--w:61.7" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t4 }}" alt="" width="374" height="714" style="--x:858;--b:3.3;--w:124.7" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t3 }}" alt="" width="266" height="710" style="--x:940.7;--b:4.3;--w:88.6" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t2 }}" alt="" width="219" height="689" style="--x:1020;--b:0.7;--w:73" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t1 }}" alt="" width="306" height="713" style="--x:1074.7;--b:0.3;--w:102" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t5 }}" alt="" width="185" height="698" style="--x:502;--b:3.3;--w:61.7" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t4 }}" alt="" width="374" height="714" style="--x:401;--b:1.3;--w:124.7" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t3 }}" alt="" width="266" height="710" style="--x:349.7;--b:2.3;--w:88.6" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t2 }}" alt="" width="219" height="689" style="--x:299;--b:0.7;--w:73" data-sway>
+        <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t1 }}" alt="" width="306" height="713" style="--x:213.7;--b:0.3;--w:102" data-sway>
+      </div>
+    </header>
+
+    {%- comment -%} 3 · Live countdown to the wedding date. {%- endcomment -%}
+    <section
+      class="ete-slide ete-countdown"
+      data-ete-countdown
+      data-one="{{ k | append: 'day_to_go' | t }}"
+      data-many="{{ k | append: 'days_to_go' | t }}"
+      data-today="{{ k | append: 'today' | t }}"
+      data-married="{{ k | append: 'married' | t }}"
+    >
+      <img class="ete-abs ete-abs--top ete-countdown__lights" src="{{ 'ete-bunting.webp' | asset_url }}" alt="" width="2400" height="840" loading="lazy" decoding="async" style="--x:0;--y:173.3;--w:1366">
+      <p class="ete-countdown__num ete-caps" data-inv-reveal><span data-ete-days>{% render 'inv-digits', value: days_left, lang: lang %}</span></p>
+      <p class="ete-kicker ete-countdown__label" data-inv-reveal data-ete-days-label>
+        {%- if days_left == 1 -%}{{ k | append: 'day_to_go' | t }}{%- else -%}{{ k | append: 'days_to_go' | t }}{%- endif -%}
+      </p>
+    </section>
+
+    {%- comment -%} 4 · Scratch the lace frame to reveal the venue photo underneath. {%- endcomment -%}
+    <section class="ete-slide ete-venue" aria-labelledby="EteVenueTitle">
+      <h2 class="ete-title" id="EteVenueTitle" data-inv-reveal>{{ k | append: 'scratch_heading' | t }}</h2>
+      <div class="ete-scratch" data-ete-scratch data-inv-reveal>
+        <div class="ete-scratch__window">
+          {%- if venue_photo -%}
+            {{ venue_photo | image_url: width: 1100 | image_tag: class: 'ete-scratch__photo', loading: 'lazy', sizes: '(min-width: 700px) 460px, 70vw', alt: m.venue_name.value }}
+          {%- else -%}
+            <img class="ete-scratch__photo" src="{{ 'ete-venue.jpg' | asset_url }}" alt="{{ m.venue_name.value | escape }}" width="1320" height="988" loading="lazy" decoding="async">
+          {%- endif -%}
+          <canvas class="ete-scratch__cover" data-ete-scratch-canvas data-texture="{{ 'ete-scratch.jpg' | asset_url }}" aria-hidden="true"></canvas>
+        </div>
+        <img class="ete-scratch__frame" src="{{ 'ete-frame.webp' | asset_url }}" alt="" width="1200" height="912" loading="lazy" decoding="async">
+        <button type="button" class="ete-scratch__reveal" data-ete-scratch-reveal>{{ k | append: 'scratch_reveal' | t }}</button>
+      </div>
+      <p class="ete-caps ete-venue__name" data-inv-reveal>{{ m.venue_name.value }}</p>
+      {%- if m.venue_address.value != blank -%}
+        <p class="ete-venue__place" data-inv-reveal>{{ m.venue_address.value | newline_to_br | replace: '<br />', ', ' | strip_newlines }}</p>
+      {%- endif -%}
+    </section>
+
+    {%- comment -%} 5–6 · The celebrations, one card each (field "celebrations", or the wedding itself). {%- endcomment -%}
+    {%- liquid
+      assign celebration_lines = m.celebrations.value | default: '' | newline_to_br | split: '<br />'
+      assign has_celebrations = false
+      for line in celebration_lines
+        assign clean = line | strip_newlines | strip
+        if clean != blank
+          assign has_celebrations = true
+          break
+        endif
+      endfor
+      if has_celebrations == false
+        assign celebration_lines = k | append: 'the_wedding' | t | split: '|||'
+      endif
+    -%}
+    <section class="ete-celebrations" aria-labelledby="EteCelebrations">
+      <h2 class="ete-title" id="EteCelebrations" data-inv-reveal>{{ k | append: 'celebrations' | t }}</h2>
+      {%- for line in celebration_lines -%}
+        {%- liquid
+          assign clean = line | strip_newlines | strip
+          if clean == blank
+            continue
+          endif
+          assign parts = clean | split: '|'
+          assign c_title = parts[0] | strip
+          assign c_venue = parts[1] | strip
+          assign c_date = parts[2] | strip
+          assign c_time = parts[3] | strip
+          assign c_map = parts[4] | strip
+          assign c_note = parts[5] | strip
+          if c_venue == blank
+            assign c_venue = m.venue_name.value
+          endif
+          if c_date == blank
+            assign c_date = ds
+          endif
+          if c_time == blank
+            assign c_time = m.event_time.value | default: '19:00'
+          endif
+          if c_map == blank
+            assign c_map = m.map_url.value
+          endif
+
+          assign c_t = c_time | split: ':'
+          assign c_h24 = c_t[0] | plus: 0
+          assign c_min = c_t[1] | default: '00'
+          assign c_h12 = c_h24 | modulo: 12
+          if c_h12 == 0
+            assign c_h12 = 12
+          endif
+          if lang == 'ar'
+            if c_h24 >= 12
+              assign c_mer = 'مساءً'
+            else
+              assign c_mer = 'صباحًا'
+            endif
+          else
+            if c_h24 >= 12
+              assign c_mer = 'PM'
+            else
+              assign c_mer = 'AM'
+            endif
+          endif
+          assign c_time_label = c_h12
+          if c_min != '00'
+            assign c_time_label = c_time_label | append: ':' | append: c_min
+          endif
+          assign c_time_label = c_time_label | append: ' ' | append: c_mer
+        -%}
+        <article class="ete-card ete-event" data-inv-reveal>
+          <h3 class="ete-event__title">{{ c_title }}</h3>
+          <p class="ete-script ete-event__venue">{{ c_venue }}</p>
+          <p class="ete-caps ete-event__date">
+            {%- if lang == 'ar' -%}
+              {%- render 'inv-date', date: c_date, lang: lang, weekday: false -%}
+            {%- else -%}
+              {{- c_date | date: '%B %-d, %Y' -}}
+            {%- endif -%}
+          </p>
+          <p class="ete-caps ete-event__time">
+            <img src="{{ 'ete-clock.webp' | asset_url }}" alt="" width="140" height="140" loading="lazy" decoding="async">
+            <span>{% render 'inv-digits', value: c_time_label, lang: lang %}</span>
+          </p>
+          {%- if c_map != blank -%}
+            <a class="ete-event__map" href="{{ c_map | escape }}" target="_blank" rel="noopener">{{ k | append: 'view_on_map' | t }}</a>
+          {%- endif -%}
+          {%- if c_note != blank -%}
+            <p class="ete-script ete-event__note">{{ c_note }}</p>
+          {%- endif -%}
+        </article>
+      {%- endfor -%}
+    </section>
+
+    {%- comment -%} 7 · The day's timeline; the fan opens frame by frame as you scroll onto it. {%- endcomment -%}
+    {%- if m.schedule.value != blank -%}
+      <section class="ete-slide ete-timeline" aria-labelledby="EteTimeline" data-ete-fan-section>
+        <h2 class="ete-title" id="EteTimeline" data-inv-reveal>{{ k | append: 'timeline' | t }}</h2>
+        <ol class="ete-timeline__list" role="list">
+          {%- assign lines = m.schedule.value | newline_to_br | split: '<br />' -%}
+          {%- for line in lines -%}
+            {%- assign clean = line | strip_newlines | strip -%}
+            {%- if clean == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign parts = clean | split: '|' -%}
+            <li class="ete-timeline__item" data-inv-reveal>
+              {%- if parts.size > 1 -%}
+                <span class="ete-caps ete-timeline__time">{{ parts[0] | strip }}</span>
+                <span class="ete-timeline__label">{{ parts[1] | strip }}</span>
+              {%- else -%}
+                <span class="ete-caps ete-timeline__time"></span>
+                <span class="ete-timeline__label">{{ clean }}</span>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ol>
+        <div
+          class="ete-fan"
+          aria-hidden="true"
+          data-ete-fan
+          {% if fan_frames > 0 %}data-frames="{{ fan_frames }}"{% endif %}
+        >
+          <img class="ete-fan__img" src="{{ 'ete-fan.webp' | asset_url }}" alt="" width="960" height="1361" loading="lazy" decoding="async">
+        </div>
+      </section>
+    {%- endif -%}
+
+    {%- comment -%} 8 · Gifts. {%- endcomment -%}
+    {%- if m.gifts_note.value != blank -%}
+      <section class="ete-slide ete-gifts" aria-labelledby="EteGifts">
+        <img class="ete-gifts__envelope" src="{{ 'ete-gift.webp' | asset_url }}" alt="" width="600" height="362" loading="lazy" decoding="async" data-inv-reveal>
+        <div class="ete-card ete-gifts__card" data-inv-reveal>
+          <h2 class="ete-title" id="EteGifts">{{ k | append: 'gifts' | t }}</h2>
+          <p class="ete-gifts__text">{{ m.gifts_note.value | escape | newline_to_br }}</p>
+        </div>
+      </section>
+    {%- endif -%}
+
+    {%- comment -%} 9 · RSVP. {%- endcomment -%}
+    {%- unless rsvp_mode == 'none' -%}
+      <section class="ete-slide ete-rsvp" id="rsvp" aria-labelledby="EteRsvp">
+        <img class="ete-abs ete-abs--top ete-rsvp__vase" src="{{ 'ete-vase.webp' | asset_url }}" alt="" width="393" height="760" loading="lazy" decoding="async" style="--x:1157.7;--y:391;--w:180">
+        <h2 class="ete-title" id="EteRsvp" data-inv-reveal>{{ k | append: 'rsvp' | t }}</h2>
+        {%- if m.rsvp_deadline.value != blank -%}
+          {%- capture deadline -%}{% render 'inv-date', date: m.rsvp_deadline.value, lang: lang, weekday: false %}{%- endcapture -%}
+          <p class="ete-rsvp__deadline" data-inv-reveal>{{ k | append: 'rsvp_by' | t: date: deadline }}</p>
+        {%- endif -%}
+
+        {%- capture rsvp_fields -%}
+          <input type="hidden" name="contact[Guests]" value="1" data-ete-guest-count>
+          <input type="hidden" name="contact[Companions]" value="" data-ete-companions-summary>
+          <fieldset class="ete-field ete-choice">
+            <legend>{{ k | append: 'attending' | t }}</legend>
+            <label><input type="radio" name="contact[Attending]" value="{{ k | append: 'delighted_accept' | t }}" data-attending="yes" checked> <span>{{ k | append: 'delighted_accept' | t }}</span></label>
+            <label><input type="radio" name="contact[Attending]" value="{{ k | append: 'unable_attend' | t }}" data-attending="no"> <span>{{ k | append: 'unable_attend' | t }}</span></label>
+          </fieldset>
+          <div class="ete-field">
+            <label for="EteRsvpName">{{ k | append: 'full_name' | t }}</label>
+            <input id="EteRsvpName" type="text" name="contact[name]" autocomplete="name" placeholder="{{ k | append: 'full_name_placeholder' | t }}" required>
+          </div>
+          {%- if rsvp_mode == 'form' -%}
+            <div class="ete-field">
+              <label for="EteRsvpEmail">{{ k | append: 'email' | t }}</label>
+              <input id="EteRsvpEmail" type="email" name="contact[email]" autocomplete="email" required dir="ltr">
+            </div>
+          {%- endif -%}
+          <div class="ete-rsvp__attending" data-guests-field>
+            <div class="ete-field">
+              <label for="EteRsvpDiet">{{ k | append: 'dietary' | t }}</label>
+              <input id="EteRsvpDiet" type="text" name="contact[Dietary requirements]" placeholder="{{ k | append: 'dietary_placeholder' | t }}">
+            </div>
+            {%- if companions_max > 0 -%}
+              <div
+                class="ete-field ete-companions"
+                data-ete-companions
+                data-max="{{ companions_max }}"
+                data-adult="{{ k | append: 'adult' | t }}"
+                data-child="{{ k | append: 'child' | t }}"
+                data-name="{{ k | append: 'companion_name' | t }}"
+                data-allergies="{{ k | append: 'companion_allergies' | t }}"
+                data-remove="{{ k | append: 'remove' | t }}"
+              >
+                <p class="ete-field__label" id="EteCompanions">{{ k | append: 'companions' | t }}</p>
+                <p class="ete-field__hint">{{ k | append: 'companions_hint' | t }}</p>
+                <ul class="ete-companions__list" role="list" aria-labelledby="EteCompanions" data-ete-companion-list></ul>
+                <div class="ete-companions__add">
+                  <button type="button" class="ete-chip" data-ete-add="adult">{{ k | append: 'add_adult' | t }}</button>
+                  <button type="button" class="ete-chip" data-ete-add="child">{{ k | append: 'add_child' | t }}</button>
+                </div>
+                <p class="ete-field__hint ete-companions__max" data-ete-companions-max hidden>{{ k | append: 'companions_max' | t: count: companions_max }}</p>
+              </div>
+            {%- endif -%}
+          </div>
+          <div class="ete-field">
+            <label for="EteRsvpSong">{{ k | append: 'song' | t }}</label>
+            <input id="EteRsvpSong" type="text" name="contact[Song request]" placeholder="{{ k | append: 'song_placeholder' | t }}">
+          </div>
+        {%- endcapture -%}
+
+        <div class="ete-rsvp__body" data-inv-reveal>
+          {%- case rsvp_mode -%}
+            {%- when 'whatsapp' -%}
+              <form class="inv-rsvp__form ete-form" data-rsvp="whatsapp" data-whatsapp="{{ m.rsvp_whatsapp.value | remove: '+' | remove: ' ' }}"
+                data-message="{{ k | append: 'whatsapp_message' | t: names: '%names%', guest: '%guest%', answer: '%answer%', count: '%count%' }}">
+                {{ rsvp_fields }}
+                <button type="submit" class="ete-submit">{% render 'icon', name: 'whatsapp', size: 18 %} {{ k | append: 'whatsapp_reply' | t }}</button>
+              </form>
+            {%- when 'link' -%}
+              <a class="ete-submit" href="{{ m.rsvp_link.value }}" target="_blank" rel="noopener">{{ k | append: 'rsvp_link' | t }}</a>
+            {%- when 'sheet' -%}
+              <form class="inv-rsvp__form ete-form" data-rsvp="sheet" action="{{ m.rsvp_link.value }}" method="post">
+                <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }}">
+                {{ rsvp_fields }}
+                <button type="submit" class="ete-submit">{{ k | append: 'send_rsvp' | t }}</button>
+              </form>
+            {%- else -%}
+              {%- form 'contact', id: 'RSVP', class: 'inv-rsvp__form ete-form' -%}
+                {%- if form.posted_successfully? -%}
+                  <p class="ete-rsvp__thanks" role="status">{{ k | append: 'thanks' | t }}</p>
+                {%- else -%}
+                  <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }} — {{ names }}">
+                  <input type="hidden" name="contact[Event date]" value="{{ ds | date: '%Y-%m-%d' }}">
+                  {{ rsvp_fields }}
+                  {%- if form.errors -%}<p class="ete-rsvp__error">{{ form.errors | default_errors }}</p>{%- endif -%}
+                  <button type="submit" class="ete-submit">{{ k | append: 'send_rsvp' | t }}</button>
+                {%- endif -%}
+              {%- endform -%}
+          {%- endcase -%}
+          <p class="inv-rsvp__status ete-rsvp__thanks" data-rsvp-status role="status" hidden
+            data-thanks="{{ k | append: 'thanks' | t }}"
+            data-thanks-decline="{{ k | append: 'thanks_decline' | t }}"
+            data-demo="{{ k | append: 'demo_notice' | t }}"
+            data-error="{{ k | append: 'error' | t }}"
+            data-accept="{{ k | append: 'delighted_accept' | t }}"
+            data-decline="{{ k | append: 'unable_attend' | t }}"></p>
+        </div>
+      </section>
+    {%- endunless -%}
+
+    <footer class="ete-footer">
+      <p class="ete-script ete-footer__names" aria-hidden="true">{{ i1 }} {{ i2 }}</p>
+      {%- if m.closing_line.value != blank -%}
+        <p class="ete-footer__closing">{{ m.closing_line.value }}</p>
+      {%- endif -%}
+      {%- if s.show_share -%}
+        <button type="button" class="ete-chip" data-inv-share>
+          {% render 'icon', name: 'share', size: 16 %} {{ k | append: 'share' | t }}
+        </button>
+      {%- endif -%}
+      {%- if settings.invitation_credit -%}
+        <a class="inv-footer__credit" href="{{ shop.url }}" target="_blank" rel="noopener">
+          {% render 'brand-logo', variant: 'mark' %}
+          <span>{{ k | append: 'made_with' | t }}</span>
+        </a>
+      {%- endif -%}
+    </footer>
+  </div>
+</div>

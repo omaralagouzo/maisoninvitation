@@ -18,7 +18,7 @@ export const INVITATION_DEFINITION = {
   displayNameKey: 'title',
   fields: [
     { key: 'title', name: 'Internal title', type: 'single_line_text_field', description: 'e.g. "Leila & Adam — English". Shown in admin (and as the SEO title); guests see the couple\'s names.', required: true },
-    { key: 'design', name: 'Design', type: 'single_line_text_field', required: true, choices: ['ivoire', 'minuit', 'jardin', 'sable'], description: 'Which Maison design to render.' },
+    { key: 'design', name: 'Design', type: 'single_line_text_field', required: true, choices: ['ivoire', 'minuit', 'jardin', 'sable', 'ete'], description: 'Which Maison design to render.' },
     { key: 'language', name: 'Language', type: 'single_line_text_field', required: true, choices: ['en', 'ar'], description: 'en = English (left-to-right), ar = Arabic (right-to-left).' },
     { key: 'partner_one', name: 'First name shown', type: 'single_line_text_field', required: true },
     { key: 'partner_two', name: 'Second name shown', type: 'single_line_text_field', required: true },
@@ -34,10 +34,12 @@ export const INVITATION_DEFINITION = {
     { key: 'map_url', name: 'Map link', type: 'url', description: 'Google Maps / Apple Maps share link.' },
     { key: 'show_map', name: 'Embed map', type: 'boolean' },
     { key: 'schedule', name: 'Programme', type: 'multi_line_text_field', description: 'One item per line: "7:00 PM | Guest arrival".' },
+    { key: 'celebrations', name: 'Celebrations (Été design)', type: 'multi_line_text_field', description: 'One event card per line: "Title | Venue | YYYY-MM-DD | HH:MM | Map link | Note", e.g. "The Hen | The Grand Hotel | 2027-09-30 | 15:00 | https://maps.app.goo.gl/… | ladies welcome". Leave a part empty to use the main venue, date, time or map link. Blank field = one card for the wedding.' },
+    { key: 'gifts_note', name: 'Gifts note (Été design)', type: 'multi_line_text_field', description: 'Optional gifts message. Leave blank to hide the Gifts section.' },
     { key: 'dress_code', name: 'Dress code', type: 'single_line_text_field' },
     { key: 'story', name: 'A note from the couple', type: 'multi_line_text_field' },
     { key: 'closing_line', name: 'Closing line', type: 'single_line_text_field' },
-    { key: 'cover_photo', name: 'Photo', type: 'file_reference', validations: [{ name: 'file_type_options', value: '["Image"]' }] },
+    { key: 'cover_photo', name: 'Photo', type: 'file_reference', description: 'Été design: the venue photo guests scratch to reveal.', validations: [{ name: 'file_type_options', value: '["Image"]' }] },
     { key: 'rsvp_mode', name: 'RSVP method', type: 'single_line_text_field', choices: ['form', 'sheet', 'whatsapp', 'link', 'none'], description: 'form = Shopify form (emails you) · sheet = Google Sheet endpoint · whatsapp · link · none' },
     { key: 'rsvp_deadline', name: 'RSVP by', type: 'date' },
     { key: 'rsvp_max_guests', name: 'Max guests per reply', type: 'number_integer' },
@@ -102,6 +104,19 @@ export const DESIGNS = [
       '<p>Warm, modern and graphic. Sable draws on desert sunsets — layered arcs, terracotta and sand, with bold contemporary type. Made for destination weddings and couples who like a clean, confident look.</p>',
     description_ar:
       '<p>دافئ وعصري وجريء. يستلهم تصميم سابل غروب الصحراء — أقواسٌ متدرّجة وألوان التراكوتا والرمال مع خطوطٍ معاصرة واضحة. مثاليّ لأعراس الوجهات وللأزواج الذين يفضّلون الطابع العصري الواثق.</p>',
+  },
+  {
+    handle: 'ete',
+    title: 'Été',
+    name_ar: 'إيتيه',
+    type: 'Botanical',
+    subtitle: 'Pearl-beaded trees, lace & a summer garden',
+    subtitle_ar: 'أشجار مطرّزة باللؤلؤ ودانتيل وحديقة صيفية',
+    palette: ['#FBF6F4', '#937C67', '#7C8466'],
+    description:
+      '<p>A summer garden in pearl embroidery. Été opens from a real paper envelope onto swaying beaded trees, then counts down the days beneath strings of pearl lanterns. Guests scratch a lace frame to reveal your venue, and a beaded fan opens as they scroll through the day.</p><p>Every celebration gets its own card with a map link, and the RSVP collects dietary needs, companions and song requests.</p>',
+    description_ar:
+      '<p>حديقة صيفية مطرّزة باللؤلؤ. يُفتح تصميم إيتيه من ظرفٍ ورقيٍّ حقيقي على أشجارٍ مطرّزة تتمايل، ثم يعدّ الأيام تحت عناقيد من الفوانيس اللؤلؤية. يمسح ضيوفكم إطارًا من الدانتيل ليكتشفوا المكان، وتنفتح مروحة مطرّزة وهم يتصفّحون برنامج اليوم.</p><p>لكل مناسبة بطاقتها مع رابط الخريطة، ويجمع تأكيد الحضور المتطلبات الغذائية والمرافقين وطلبات الأغاني.</p>',
   },
 ];
 
@@ -367,6 +382,68 @@ export const DEMO_INVITATIONS = [
     rsvp_max_guests: 2,
     is_demo: true,
     alternate: 'sable-en',
+  },
+  // ---------------------------------------------------------------- Été (the "Summer Wedding" Canva design)
+  {
+    handle: 'ete-en',
+    design: 'ete',
+    language: 'en',
+    title: 'Demo — Été (English)',
+    partner_one: 'Sarah',
+    partner_two: 'Deen',
+    intro_line: 'We’re getting married!',
+    event_date: '2027-10-01',
+    event_time: '14:00',
+    venue_name: 'Amazing Wedding Venue',
+    venue_address: 'City, Country',
+    map_url: 'https://maps.google.com/?q=The+Magnificent+Hotel',
+    celebrations: T(`
+The Hen | The Magnificent Hotel | 2027-09-30 | 15:00 | https://maps.google.com/?q=The+Magnificent+Hotel | ladies welcome
+The Wedding | The Magnificent Hotel | | | | all welcome`),
+    schedule: T(`
+11:00 am | Wedding Ceremony
+1:00 pm | Wedding Lunch
+3:00 pm | Cake Cutting
+4:00 pm | Cocktail Hour
+5:00 pm | First Dance
+8:00 pm | Buffet Dinner
+11:00 pm | Fireworks`),
+    gifts_note: 'Your presence is our greatest gift.\nIf you wish to honour us with a gift, we kindly prefer monetary contributions upon the start of our new chapter as husband & wife.',
+    rsvp_mode: 'form',
+    rsvp_max_guests: 6,
+    is_demo: true,
+    alternate: 'ete-ar',
+  },
+  {
+    handle: 'ete-ar',
+    design: 'ete',
+    language: 'ar',
+    title: 'Demo — Été (Arabic)',
+    partner_one: 'دين',
+    partner_two: 'سارة',
+    intro_line: 'سنحتفل بزفافنا!',
+    event_date: '2027-10-01',
+    event_time: '14:00',
+    show_hijri: true,
+    venue_name: 'قاعة الحديقة الصيفية',
+    venue_address: 'المدينة، الدولة',
+    map_url: 'https://maps.google.com/?q=The+Magnificent+Hotel',
+    celebrations: T(`
+ليلة الحنّاء | فندق ذا ماغنيفيسنت | 2027-09-30 | 15:00 | https://maps.google.com/?q=The+Magnificent+Hotel | للسيدات
+حفل الزفاف | فندق ذا ماغنيفيسنت | | | | الجميع مرحّب بهم`),
+    schedule: T(`
+١١:٠٠ صباحًا | عقد القران
+١:٠٠ مساءً | غداء الزفاف
+٣:٠٠ مساءً | تقطيع الكعكة
+٤:٠٠ مساءً | الضيافة
+٥:٠٠ مساءً | الرقصة الأولى
+٨:٠٠ مساءً | العشاء
+١١:٠٠ مساءً | الألعاب النارية`),
+    gifts_note: 'حضوركم هو أجمل هدية لنا.\nوإن رغبتم في تكريمنا بهدية، فنفضّل المساهمة المالية ونحن نبدأ فصلنا الجديد معًا.',
+    rsvp_mode: 'form',
+    rsvp_max_guests: 6,
+    is_demo: true,
+    alternate: 'ete-en',
   },
 ];
 

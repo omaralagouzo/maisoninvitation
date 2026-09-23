@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Maison — live invitation designs (Ivoire · Minuit · Jardin · Sable)
+   Maison — live invitation designs (Ivoire · Minuit · Jardin · Sable; Été adds invitation-ete.css)
    One markup (sections/main-invitation.liquid), four skins via custom properties.
    Mobile-first; on larger screens the invitation sits in a centred column.
    Logical properties throughout so Arabic invitations mirror correctly.
@@ -645,11 +645,11 @@ body.inv-body--ivoire { background: #F7F3EC; }
 /* ------------------------------------------------------------------ reveal */
 [data-inv-reveal] { transition: opacity 1s var(--inv-ease-out), transform 1.2s var(--inv-ease-out); }
 [data-inv-reveal].inv-pending { opacity: 0; transform: translateY(18px); }
-.inv:not(.is-open) .inv-hero [data-inv-reveal].inv-hold { opacity: 0; transform: translateY(14px); }
-.inv-hero [data-inv-reveal] { transition-delay: calc(var(--i, 0) * 0.12s); }
+.inv:not(.is-open) :is(.inv-hero, [data-inv-hero]) [data-inv-reveal].inv-hold { opacity: 0; transform: translateY(14px); }
+:is(.inv-hero, [data-inv-hero]) [data-inv-reveal] { transition-delay: calc(var(--i, 0) * 0.12s); }
 
 @media (prefers-reduced-motion: reduce) {
   html.inv-html { scroll-behavior: auto; }
   .inv *, .inv *::before, .inv *::after { animation: none !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
-  [data-inv-reveal].inv-pending, .inv:not(.is-open) .inv-hero [data-inv-reveal].inv-hold { opacity: 1; transform: none; }
+  [data-inv-reveal].inv-pending, .inv:not(.is-open) :is(.inv-hero, [data-inv-hero]) [data-inv-reveal].inv-hold { opacity: 1; transform: none; }
 }

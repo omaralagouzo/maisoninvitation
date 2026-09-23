@@ -90,6 +90,40 @@ Fonts: invitation fonts are self-hosted in `assets/`. To add one, append it to `
 
 ---
 
+## 3b. The Été design (Summer Wedding)
+
+Été follows the Canva design section by section and uses a few extra fields:
+
+| Section | Comes from |
+|---|---|
+| Envelope | The couple's initials on the flap |
+| Names & date | *Opening line* (default "We're getting married!"), the two names, *Date* |
+| Days to go | *Date*, counted live in the guest's browser |
+| Scratch to reveal | **Photo** (the venue picture guests scratch to uncover; the design's villa photo if empty), *Venue*, *Venue address* |
+| The Celebrations | **Celebrations**: one card per line, `Title \| Venue \| YYYY-MM-DD \| HH:MM \| Map link \| Note`. Leave a part empty to use the main venue, date, time or map link, e.g. `The Wedding \| \| \| \| \| all welcome`. Empty field = a single wedding card |
+| Wedding Day Timeline | *Programme*, one line per item: `11:00 am \| Wedding Ceremony` |
+| Gifts | **Gifts note** (section hidden when empty) |
+| RSVP | *RSVP method* as usual. *Max guests per reply* caps companions (max − 1) |
+
+**VIEW ON MAP** opens the card's map link. The demo uses placeholder Google Maps links; paste the real share link
+(Google Maps → Share → Copy link) into *Map link* or into the celebration line.
+
+**The fan animation.** The fan opens as guests scroll onto the timeline, one frame per step of scroll. It ships with
+a built-in animation made from the still image. To use your own frame-by-frame animation:
+
+1. Render the fan opening as a video (closed → open), on a transparent or `#FBF6F4` background, portrait,
+   roughly the shape of `assets/ete-fan.webp`.
+2. Turn it into numbered frames (40–80 is plenty):
+   ```bash
+   ffmpeg -i fan.mov -vf "fps=24,scale=960:-1" -c:v libwebp -quality 80 assets/ete-fan-%03d.webp
+   ```
+3. Push the theme, then in **Online Store → Themes → Customize → Theme settings → Invitations → Été design**, set
+   **Fan animation frames** to the number of files.
+
+To regenerate Été's product photos after changing the design: `npm run preview:build && npm run images -- --only=ete`.
+
+---
+
 ## 4. Editing wording & translations
 
 * **In Shopify:** Online Store → Themes → Customize. Every text field left **blank** uses the default wording,

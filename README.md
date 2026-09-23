@@ -11,7 +11,7 @@ Digital wedding invitations in English and Arabic, sold on **Shopify** with a **
 | | |
 |---|---|
 | **The storefront** | A complete Shopify Online Store 2.0 theme at the repo root: homepage (hero "It starts here" with a live phone demo, English/Arabic invitation showcase, how it works, features, FAQ), collection, **3-step product wizard**, cart, content pages, accounts, 404, "Opening soon" password page. Fully bilingual, with a real right-to-left Arabic layout. |
-| **The product** | Live invitation pages hosted on Shopify (metaobjects → `/pages/invitation/<couple>`), in **4 starter designs** (Ivoire, Minuit, Jardin, Sable) × English / Arabic. |
+| **The product** | Live invitation pages hosted on Shopify (metaobjects → `/pages/invitation/<couple>`), in **5 designs** (Ivoire, Minuit, Jardin, Sable, and **Été**, built from the "Summer Wedding" Canva design) × English / Arabic. |
 | **The brand** | The logo rebuilt as true vector files plus enhanced versions (wax seal, app icon, stacked monogram, arched badge). See `brand/`. |
 | **The tooling** | Offline preview renderer, product-photo generator, Shopify store seeding script, Theme Check. |
 
@@ -51,3 +51,5 @@ python3 tools/brand/build_logos.py # regenerate logo SVGs + theme logo snippet
 * **About page** copy (a general husband-and-wife studio story; make it yours) and a photo.
 * **Contact email** (`hello@maisoninvitation.com` is the preview placeholder; the store email is used once live).
 * The four starter designs stand in for your Canva designs until you add them (see OPERATIONS → Adding a new design).
+  **Été** is the first Canva design added. Its demo keeps the Canva placeholder text ("Amazing Wedding Venue",
+  "City, Country"), dummy map links and the venue photo from the design; see OPERATIONS → The Été design.
