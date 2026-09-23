@@ -263,7 +263,7 @@
               </div>
               <div class="field">
                 <label class="field__label" for="Notes">{{ 'products.product.field_notes' | t }} <small>{{ 'products.product.optional' | t }}</small></label>
-                <textarea id="Notes" name="properties[Notes]" rows="4" placeholder="{{ 'products.product.field_notes_hint' | t | escape }}"></textarea>
+                <textarea id="Notes" name="properties[Notes]" rows="4" placeholder="{{ 'products.product.field_notes_hint' | t }}"></textarea>
               </div>
             </div>
             <div class="wizard__nav wizard__nav--steps">
@@ -279,7 +279,7 @@
               <h2 class="wizard__step-title">{{ 'products.product.step_review_heading' | t }}</h2>
             </div>
 
-            <dl class="summary" data-summary-list data-missing="{{ 'products.product.summary_missing' | t | escape }}">
+            <dl class="summary" data-summary-list data-missing="{{ 'products.product.summary_missing' | t }}">
               <div class="summary__row"><dt>{{ 'products.product.summary_design' | t }}</dt><dd>{{ product.title }}</dd></div>
               <div class="summary__row"><dt>{{ 'products.product.summary_language' | t }}</dt><dd data-summary-out="language">{{ current_variant.title }}</dd></div>
               <div class="summary__row"><dt>{{ 'products.product.summary_names' | t }}</dt><dd data-summary-out="names"></dd></div>

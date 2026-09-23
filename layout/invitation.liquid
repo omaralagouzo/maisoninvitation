@@ -24,7 +24,10 @@
   endcase
 
   assign k = 'invitation.' | append: lang | append: '.'
-  assign amp = k | append: 'and' | t
+  assign amp = '&'
+  if lang == 'ar'
+    assign amp = 'و'
+  endif
   assign names = m.partner_one.value | append: ' ' | append: amp | append: ' ' | append: m.partner_two.value
   assign title = k | append: 'wedding_of' | t: names: names
   assign invited = k | append: 'you_are_invited' | t
@@ -41,15 +44,15 @@
     <link rel="canonical" href="{{ canonical_url }}">
     {% render 'favicon' %}
     <title>{{ title }}</title>
-    <meta name="description" content="{{ description | strip | escape }}">
+    <meta name="description" content="{{ description | strip | escape_once }}">
     {%- liquid
       assign share_image = m.cover_photo.value
     -%}
     <meta property="og:site_name" content="{{ shop.name }}">
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ canonical_url }}">
-    <meta property="og:title" content="{{ title | escape }}">
-    <meta property="og:description" content="{{ description | strip | escape }}">
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="{{ description | strip | escape_once }}">
     {%- if share_image -%}
       <meta property="og:image" content="https:{{ share_image | image_url: width: 1200 }}">
     {%- else -%}

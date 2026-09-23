@@ -191,10 +191,10 @@
         const count = form.querySelector('[name="contact[Guests]"]')?.value || '1';
         const answer = attending ? status.dataset.accept : status.dataset.decline;
         const message = (form.dataset.message || '')
-          .replace('{{ names }}', root.dataset.names || '')
-          .replace('{{ guest }}', name)
-          .replace('{{ answer }}', answer)
-          .replace('{{ count }}', attending ? count : '0');
+          .replace('%names%', root.dataset.names || '')
+          .replace('%guest%', name)
+          .replace('%answer%', answer)
+          .replace('%count%', attending ? count : '0');
         window.open(`https://wa.me/${form.dataset.whatsapp}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
         return;
       }

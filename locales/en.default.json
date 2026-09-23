@@ -439,7 +439,7 @@
     },
     "about": {
       "heading": "Why we started",
-      "text": "<p>When we planned our own celebration, we wanted an invitation that felt personal and elegant — and that worked beautifully for guests reading in Arabic and in English. We couldn’t find it, so we made it.</p><p>Today every Maison invitation is designed by hand, set with care in both languages and delivered as a single link your guests will return to until the big day. No apps, no clutter — just the moment your story begins.</p>",
+      "text_html": "<p>When we planned our own celebration, we wanted an invitation that felt personal and elegant — and that worked beautifully for guests reading in Arabic and in English. We couldn’t find it, so we made it.</p><p>Today every Maison invitation is designed by hand, set with care in both languages and delivered as a single link your guests will return to until the big day. No apps, no clutter — just the moment your story begins.</p>",
       "value_1_title": "Designed by hand",
       "value_1_text": "Every invitation is set by a person, not a template engine.",
       "value_2_title": "Two languages, one standard",
@@ -452,7 +452,6 @@
     "en": {
       "tap_to_open": "Tap to open",
       "you_are_invited": "You are invited",
-      "and": "&",
       "countdown_heading": "Counting down",
       "days": "Days",
       "hours": "Hours",
@@ -496,7 +495,6 @@
     "ar": {
       "tap_to_open": "اضغط لفتح الدعوة",
       "you_are_invited": "أنتم مدعوّون",
-      "and": "و",
       "countdown_heading": "العدّ التنازلي",
       "days": "يوم",
       "hours": "ساعة",

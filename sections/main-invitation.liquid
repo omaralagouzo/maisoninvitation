@@ -17,7 +17,10 @@
 
   assign p1 = m.partner_one.value
   assign p2 = m.partner_two.value
-  assign amp = k | append: 'and' | t
+  assign amp = '&'
+  if lang == 'ar'
+    assign amp = 'و'
+  endif
   assign names = p1 | append: ' ' | append: amp | append: ' ' | append: p2
   assign i1 = p1 | slice: 0
   assign i2 = p2 | slice: 0
@@ -83,7 +86,7 @@
   data-lang="{{ lang }}"
   data-date="{{ iso }}"
   data-names="{{ names | escape }}"
-  data-title="{{ k | append: 'wedding_of' | t: names: names | escape }}"
+  data-title="{{ k | append: 'wedding_of' | t: names: names }}"
   data-venue="{{ m.venue_name.value | escape }}{% if m.venue_address.value != blank %}, {{ m.venue_address.value | newline_to_br | replace: '<br />', ', ' | strip_newlines | escape }}{% endif %}"
   data-demo="{{ is_demo }}"
   data-hijri="{% if lang == 'ar' and m.show_hijri.value == true and m.date_note.value == blank %}true{% endif %}"
@@ -217,8 +220,8 @@
           <div><span class="inv-countdown__num" data-cd="seconds">—</span><span class="inv-countdown__label">{{ k | append: 'seconds' | t }}</span></div>
         </div>
         <p class="inv-countdown__done" data-countdown-done hidden
-          data-today="{{ k | append: 'today' | t | escape }}"
-          data-married="{{ k | append: 'married' | t | escape }}"></p>
+          data-today="{{ k | append: 'today' | t }}"
+          data-married="{{ k | append: 'married' | t }}"></p>
       </section>
     {%- endif -%}
 
@@ -340,7 +343,7 @@
           {%- case rsvp_mode -%}
             {%- when 'whatsapp' -%}
               <form class="inv-rsvp__form" data-rsvp="whatsapp" data-whatsapp="{{ m.rsvp_whatsapp.value | remove: '+' | remove: ' ' }}"
-                data-message="{{ k | append: 'whatsapp_message' | t | escape }}">
+                data-message="{{ k | append: 'whatsapp_message' | t: names: '%names%', guest: '%guest%', answer: '%answer%', count: '%count%' }}">
                 {{ rsvp_fields }}
                 <button type="submit" class="inv-button">{% render 'icon', name: 'whatsapp', size: 18 %} {{ k | append: 'whatsapp_reply' | t }}</button>
               </form>
@@ -378,12 +381,12 @@
               {%- endform -%}
           {%- endcase -%}
           <p class="inv-rsvp__status" data-rsvp-status role="status" hidden
-            data-thanks="{{ k | append: 'thanks' | t | escape }}"
-            data-thanks-decline="{{ k | append: 'thanks_decline' | t | escape }}"
-            data-demo="{{ k | append: 'demo_notice' | t | escape }}"
-            data-error="{{ k | append: 'error' | t | escape }}"
-            data-accept="{{ k | append: 'accept' | t | escape }}"
-            data-decline="{{ k | append: 'decline' | t | escape }}"></p>
+            data-thanks="{{ k | append: 'thanks' | t }}"
+            data-thanks-decline="{{ k | append: 'thanks_decline' | t }}"
+            data-demo="{{ k | append: 'demo_notice' | t }}"
+            data-error="{{ k | append: 'error' | t }}"
+            data-accept="{{ k | append: 'accept' | t }}"
+            data-decline="{{ k | append: 'decline' | t }}"></p>
         </div>
       </section>
     {%- endunless -%}

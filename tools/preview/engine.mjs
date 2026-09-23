@@ -130,7 +130,10 @@ function translate(key, args, { translations, fallback, locale }) {
       return '';
     }
   }
-  return String(value).replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k) => (kw[k] !== undefined ? String(kw[k]) : ''));
+  // Like Shopify: output is HTML-escaped (interpolations included) unless the key ends in _html.
+  const html = key.endsWith('_html');
+  const esc = (v) => (html ? String(v) : escapeHtml(v));
+  return esc(value).replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k) => (kw[k] !== undefined ? esc(kw[k]) : ''));
 }
 
 function formatMoney(cents, format, currency) {

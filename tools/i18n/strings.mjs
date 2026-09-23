@@ -577,7 +577,8 @@ export default {
     },
     about: {
       heading: ['Why we started', 'لماذا بدأنا'],
-      text: [
+      // keys ending in _html are not HTML-escaped by Shopify's t filter
+      text_html: [
         '<p>When we planned our own celebration, we wanted an invitation that felt personal and elegant — and that worked beautifully for guests reading in Arabic and in English. We couldn’t find it, so we made it.</p><p>Today every Maison invitation is designed by hand, set with care in both languages and delivered as a single link your guests will return to until the big day. No apps, no clutter — just the moment your story begins.</p>',
         '<p>عندما خطّطنا لاحتفالنا، أردنا دعوةً شخصيةً وأنيقة — تبدو جميلة لضيوفنا بالعربية والإنجليزية على حدٍّ سواء. لم نجدها، فصنعناها.</p><p>اليوم تُصمَّم كل دعوة من الميزون يدويًا، وتُنسَّق بعناية باللغتين، وتصل برابطٍ واحد يعود إليه ضيوفكم حتى اليوم الكبير. بلا تطبيقات ولا ازدحام — فقط اللحظة التي تبدأ فيها حكايتكم.</p>',
       ],
@@ -597,7 +598,6 @@ export default {
     en: {
       tap_to_open: ['Tap to open', 'Tap to open'],
       you_are_invited: ['You are invited', 'You are invited'],
-      and: ['&', '&'],
       countdown_heading: ['Counting down', 'Counting down'],
       days: ['Days', 'Days'],
       hours: ['Hours', 'Hours'],
@@ -644,7 +644,6 @@ export default {
     ar: {
       tap_to_open: ['اضغط لفتح الدعوة', 'اضغط لفتح الدعوة'],
       you_are_invited: ['أنتم مدعوّون', 'أنتم مدعوّون'],
-      and: ['و', 'و'],
       countdown_heading: ['العدّ التنازلي', 'العدّ التنازلي'],
       days: ['يوم', 'يوم'],
       hours: ['ساعة', 'ساعة'],
