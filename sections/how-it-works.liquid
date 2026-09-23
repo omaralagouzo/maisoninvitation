@@ -1,0 +1,99 @@
+{%- liquid
+  assign s = section.settings
+  assign eyebrow = s.eyebrow
+  if eyebrow == blank
+    assign eyebrow = 'sections.how.eyebrow' | t
+  endif
+  assign heading = s.heading
+  if heading == blank
+    assign heading = 'sections.how.heading' | t
+  endif
+  assign button_label = s.button_label
+  if button_label == blank
+    assign button_label = 'sections.how.button' | t
+  endif
+  assign button_link = s.button_link
+  if button_link == blank
+    assign button_link = collections['invitations'].url | default: routes.all_products_collection_url
+  endif
+-%}
+<section class="section{% if s.background == 'alt' %} section--alt{% endif %}" id="how-it-works" aria-labelledby="How-{{ section.id }}">
+  <div class="page-width">
+    <div class="section-intro{% if s.center %} section-intro--center{% endif %}">
+      <p class="eyebrow eyebrow--rule" data-reveal>{{ eyebrow }}</p>
+      <h2 class="h1" id="How-{{ section.id }}" data-reveal>{{ heading }}</h2>
+    </div>
+
+    <ol class="steps" role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign n = forloop.index
+          assign title = block.settings.title
+          if title == blank
+            assign key = 'sections.how.step_' | append: n | append: '_title'
+            assign title = key | t
+          endif
+          assign body = block.settings.text
+          if body == blank
+            assign key = 'sections.how.step_' | append: n | append: '_text'
+            assign body = key | t
+          endif
+        -%}
+        <li class="step" data-reveal style="--reveal-delay: {{ forloop.index0 | times: 0.08 }}s" {{ block.shopify_attributes }}>
+          <span class="step__number" aria-hidden="true">{{ n | prepend: '0' | slice: -2, 2 }}</span>
+          <h3 class="step__title">{{ title }}</h3>
+          <p class="step__text">{{ body }}</p>
+        </li>
+      {%- endfor -%}
+    </ol>
+
+    {%- if s.show_button -%}
+      <div class="steps__cta" data-reveal>
+        <a class="btn" href="{{ button_link }}">{{ button_label }} {% render 'icon', name: 'arrow', size: 18 %}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "How it works",
+  "tag": "div",
+  "settings": [
+    { "type": "paragraph", "content": "Leave text blank to use the default (automatically translated) wording." },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "placeholder": "How it works" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "default", "label": "Cream" },
+        { "value": "alt", "label": "Deeper cream" }
+      ],
+      "default": "default"
+    },
+    { "type": "checkbox", "id": "center", "label": "Center heading", "default": false },
+    { "type": "checkbox", "id": "show_button", "label": "Show button", "default": true },
+    { "type": "text", "id": "button_label", "label": "Button label", "placeholder": "Start designing" },
+    { "type": "url", "id": "button_link", "label": "Button link" }
+  ],
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "limit": 6,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title" },
+        { "type": "textarea", "id": "text", "label": "Text" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "How it works",
+      "blocks": [{ "type": "step" }, { "type": "step" }, { "type": "step" }, { "type": "step" }]
+    }
+  ]
+}
+{% endschema %}

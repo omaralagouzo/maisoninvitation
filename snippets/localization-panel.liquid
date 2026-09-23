@@ -1,0 +1,64 @@
+{%- comment -%}
+  World-icon panel: ONE panel with two labelled groups — Language and Currency.
+  Uses Shopify's native localization form, so languages come from
+  Settings → Languages and currencies from Settings → Markets.
+
+  Note: this controls the *website* language. The English / Arabic tabs on the
+  homepage browse *invitation* examples — a different job (see docs/ARCHITECTURE.md).
+{%- endcomment -%}
+{%- form 'localization', id: form_id, class: 'localization-form' -%}
+  <div class="localization">
+    <div class="localization__group" role="group" aria-labelledby="{{ form_id }}-language">
+      <p class="localization__label" id="{{ form_id }}-language">
+        {% render 'icon', name: 'language', size: 16 %}
+        {{ 'header.localization.language' | t }}
+      </p>
+      <ul class="localization__list" role="list">
+        {%- for language in localization.available_languages -%}
+          <li>
+            <button
+              type="submit"
+              name="language_code"
+              value="{{ language.iso_code }}"
+              class="localization__option{% if language.iso_code == localization.language.iso_code %} is-active{% endif %}"
+              lang="{{ language.iso_code }}"
+              {% if language.iso_code == localization.language.iso_code %}aria-current="true"{% endif %}
+            >
+              <span>{{ language.endonym_name | capitalize }}</span>
+              {%- if language.iso_code == localization.language.iso_code -%}
+                {% render 'icon', name: 'check', size: 16 %}
+              {%- endif -%}
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    <div class="localization__group" role="group" aria-labelledby="{{ form_id }}-currency">
+      <p class="localization__label" id="{{ form_id }}-currency">
+        <span class="localization__currency-glyph" aria-hidden="true">{{ localization.country.currency.symbol }}</span>
+        {{ 'header.localization.currency' | t }}
+      </p>
+      <ul class="localization__list localization__list--scroll" role="list">
+        {%- for country in localization.available_countries -%}
+          <li>
+            <button
+              type="submit"
+              name="country_code"
+              value="{{ country.iso_code }}"
+              class="localization__option{% if country.iso_code == localization.country.iso_code %} is-active{% endif %}"
+              {% if country.iso_code == localization.country.iso_code %}aria-current="true"{% endif %}
+            >
+              <span class="localization__currency">{{ country.currency.iso_code }} <span class="localization__symbol">{{ country.currency.symbol }}</span></span>
+              <span class="localization__country">{{ country.name }}</span>
+              {%- if country.iso_code == localization.country.iso_code -%}
+                {% render 'icon', name: 'check', size: 16 %}
+              {%- endif -%}
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+  <p class="localization__note">{{ 'header.localization.note' | t }}</p>
+{%- endform -%}

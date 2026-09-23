@@ -1,0 +1,48 @@
+{%- comment -%}
+  Invitations mega-menu. Pulls products from `collection`, so new designs show up
+  automatically. Once the collection has more than `group_threshold` products (and
+  more than one product type), designs are grouped by product type (style).
+{%- endcomment -%}
+{%- liquid
+  assign products = collection.products
+  assign total = collection.products_count | default: products.size
+  assign types = products | map: 'type' | uniq
+  assign grouped = false
+  if total > group_threshold and types.size > 1
+    assign grouped = true
+  endif
+-%}
+<div class="mega-menu__inner page-width">
+  <div class="mega-menu__intro">
+    <p class="eyebrow">{{ 'header.mega.eyebrow' | t }}</p>
+    <p class="mega-menu__heading">{{ 'header.mega.heading' | t }}</p>
+    <p class="mega-menu__text">{{ 'header.mega.text' | t }}</p>
+    <div class="mega-menu__links">
+      <a class="btn btn--small" href="{{ collection.url }}">{{ 'header.mega.view_all' | t }}</a>
+      <a class="link-arrow" href="{{ how_url }}">{{ 'header.mega.how' | t }} {% render 'icon', name: 'arrow', size: 16 %}</a>
+    </div>
+  </div>
+
+  <div class="mega-menu__products">
+    {%- if grouped -%}
+      {%- for type in types -%}
+        <div class="mega-menu__group">
+          <p class="eyebrow mega-menu__group-title">{% if type != blank %}{{ type }}{% else %}{{ 'header.mega.occasion' | t }}{% endif %}</p>
+          <ul class="mega-menu__grid mega-menu__grid--compact" role="list">
+            {%- for product in products -%}
+              {%- if product.type == type -%}
+                <li>{% render 'mega-menu-item', product: product, compact: true %}</li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endfor -%}
+    {%- else -%}
+      <ul class="mega-menu__grid" role="list">
+        {%- for product in products limit: limit -%}
+          <li>{% render 'mega-menu-item', product: product %}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</div>

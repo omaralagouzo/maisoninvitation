@@ -1,0 +1,80 @@
+{%- liquid
+  assign s = section.settings
+  assign root = routes.root_url
+  if root == '/'
+    assign root = ''
+  endif
+  assign eyebrow = s.eyebrow
+  if eyebrow == blank
+    assign eyebrow = 'sections.bilingual.eyebrow' | t
+  endif
+  assign heading = s.heading
+  if heading == blank
+    assign heading = 'sections.bilingual.heading' | t
+  endif
+  assign text = s.text
+  if text == blank
+    assign text = 'sections.bilingual.text' | t
+  endif
+  assign button_label = s.button_label
+  if button_label == blank
+    assign button_label = 'sections.bilingual.button' | t
+  endif
+  assign button_link = s.button_link
+  if button_link == blank
+    assign button_link = root | append: '/pages/invitation/' | append: s.demo_design | append: '-ar'
+  endif
+  assign asset_en = 'demo-screen-' | append: s.demo_design | append: '-en.jpg'
+  assign asset_ar = 'demo-screen-' | append: s.demo_design | append: '-ar.jpg'
+-%}
+<section class="section section--ink bilingual" aria-labelledby="Bilingual-{{ section.id }}">
+  <div class="page-width bilingual__inner">
+    <div class="bilingual__visual" aria-hidden="true">
+      <div class="bilingual__glow"></div>
+      {% render 'phone-frame', mode: 'image', image: s.image_en, asset: asset_en, alt: '' %}
+      {% render 'phone-frame', mode: 'image', image: s.image_ar, asset: asset_ar, alt: '' %}
+    </div>
+    <div class="bilingual__content">
+      <p class="eyebrow eyebrow--rule" data-reveal>{{ eyebrow }}</p>
+      <h2 class="h1" id="Bilingual-{{ section.id }}" data-reveal>{{ heading }}</h2>
+      <p class="lede" data-reveal style="margin-block-start: 22px">{{ text }}</p>
+      <ul class="bilingual__points" role="list" data-reveal>
+        <li>{% render 'icon', name: 'language', size: 20 %}{{ 'sections.bilingual.point_1' | t }}</li>
+        <li>{% render 'icon', name: 'calendar', size: 20 %}{{ 'sections.bilingual.point_2' | t }}</li>
+        <li>{% render 'icon', name: 'link', size: 20 %}{{ 'sections.bilingual.point_3' | t }}</li>
+      </ul>
+      <div data-reveal>
+        <a class="btn btn--light" href="{{ button_link }}" target="_blank" rel="noopener">{{ button_label }} {% render 'icon', name: 'arrow-up-end', size: 16 %}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Bilingual feature",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small label" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "text", "id": "button_label", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to the Arabic demo of the design below." },
+    {
+      "type": "select",
+      "id": "demo_design",
+      "label": "Design shown",
+      "options": [
+        { "value": "ivoire", "label": "Ivoire" },
+        { "value": "minuit", "label": "Minuit" },
+        { "value": "jardin", "label": "Jardin" },
+        { "value": "sable", "label": "Sable" }
+      ],
+      "default": "jardin"
+    },
+    { "type": "image_picker", "id": "image_en", "label": "English screenshot (optional)" },
+    { "type": "image_picker", "id": "image_ar", "label": "Arabic screenshot (optional)" }
+  ],
+  "presets": [{ "name": "Bilingual feature" }]
+}
+{% endschema %}

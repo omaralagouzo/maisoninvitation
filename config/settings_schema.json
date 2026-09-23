@@ -1,0 +1,176 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Maison",
+    "theme_version": "1.0.0",
+    "theme_author": "Maison Invitation",
+    "theme_documentation_url": "https://github.com/omaralagouzo/maisoninvitation",
+    "theme_support_url": "https://github.com/omaralagouzo/maisoninvitation"
+  },
+  {
+    "name": "Brand",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "The header and footer use the built-in vector Maison Invitation logo. Upload an image below only if you want to replace it."
+      },
+      {
+        "type": "image_picker",
+        "id": "logo",
+        "label": "Logo image (optional override)"
+      },
+      {
+        "type": "range",
+        "id": "logo_width",
+        "min": 100,
+        "max": 260,
+        "step": 5,
+        "unit": "px",
+        "label": "Header logo width",
+        "default": 150
+      },
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon (optional override)",
+        "info": "Square, at least 64 × 64px. Defaults to the envelope mark."
+      },
+      {
+        "type": "image_picker",
+        "id": "share_image",
+        "label": "Social sharing image",
+        "info": "Shown when your homepage is shared on WhatsApp, iMessage or social. 1200 × 630px."
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      { "type": "color", "id": "color_background", "label": "Background (cream)", "default": "#F7F3EC" },
+      { "type": "color", "id": "color_background_alt", "label": "Alternate background", "default": "#EFE8DC" },
+      { "type": "color", "id": "color_surface", "label": "Cards & panels", "default": "#FBF9F5" },
+      { "type": "color", "id": "color_text", "label": "Text (ink)", "default": "#1F1D1A" },
+      { "type": "color", "id": "color_accent", "label": "Accent (brass)", "default": "#A9824F" },
+      {
+        "type": "color",
+        "id": "color_accent_text",
+        "label": "Accent for small text",
+        "default": "#876740",
+        "info": "A deeper brass used for small labels so they stay readable (WCAG AA)."
+      },
+      { "type": "color", "id": "color_footer_background", "label": "Footer background", "default": "#1F1D1A" },
+      { "type": "color", "id": "color_footer_text", "label": "Footer text", "default": "#F7F3EC" }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Headings use Fraunces, body text uses Inter. Arabic text automatically uses Amiri and IBM Plex Sans Arabic."
+      },
+      {
+        "type": "range",
+        "id": "type_heading_scale",
+        "min": 80,
+        "max": 130,
+        "step": 5,
+        "unit": "%",
+        "label": "Heading size",
+        "default": 100
+      },
+      {
+        "type": "range",
+        "id": "type_body_scale",
+        "min": 90,
+        "max": 120,
+        "step": 5,
+        "unit": "%",
+        "label": "Body text size",
+        "default": 100
+      }
+    ]
+  },
+  {
+    "name": "Layout",
+    "settings": [
+      {
+        "type": "range",
+        "id": "page_width",
+        "min": 1000,
+        "max": 1600,
+        "step": 20,
+        "unit": "px",
+        "label": "Page width",
+        "default": 1320
+      },
+      {
+        "type": "select",
+        "id": "button_shape",
+        "label": "Button shape",
+        "options": [
+          { "value": "square", "label": "Square" },
+          { "value": "soft", "label": "Softly rounded" },
+          { "value": "pill", "label": "Pill" }
+        ],
+        "default": "square"
+      }
+    ]
+  },
+  {
+    "name": "Motion & texture",
+    "settings": [
+      { "type": "checkbox", "id": "animations_reveal", "label": "Reveal sections on scroll", "default": true },
+      { "type": "checkbox", "id": "paper_texture", "label": "Subtle paper texture", "default": true }
+    ]
+  },
+  {
+    "name": "Currency",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "currency_code_enabled",
+        "label": "Show currency codes",
+        "info": "e.g. $95.00 USD. Recommended when selling in several currencies.",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Social & contact",
+    "settings": [
+      { "type": "text", "id": "social_instagram_link", "label": "Instagram", "info": "https://instagram.com/…" },
+      { "type": "text", "id": "social_tiktok_link", "label": "TikTok" },
+      { "type": "text", "id": "social_pinterest_link", "label": "Pinterest" },
+      { "type": "text", "id": "social_facebook_link", "label": "Facebook" },
+      {
+        "type": "text",
+        "id": "whatsapp_number",
+        "label": "WhatsApp number",
+        "info": "International format without + or spaces, e.g. 971501234567. Adds a WhatsApp link to the footer and contact page."
+      },
+      { "type": "text", "id": "contact_email", "label": "Public contact email", "info": "Defaults to your store email." }
+    ]
+  },
+  {
+    "name": "Invitations",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Live invitations are metaobject entries of type “Invitation”. Each one gets its own page at /pages/invitation/…"
+      },
+      {
+        "type": "checkbox",
+        "id": "invitation_credit",
+        "label": "Show “Made with Maison Invitation” on invitations",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "invitation_envelope",
+        "label": "Open invitations with the envelope animation",
+        "default": true
+      }
+    ]
+  }
+]

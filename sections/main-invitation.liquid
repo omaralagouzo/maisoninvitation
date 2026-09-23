@@ -1,0 +1,428 @@
+{%- comment -%}
+  A live invitation, rendered from a metaobject entry of type "invitation".
+  Content is edited in Shopify admin → Content → Metaobjects → Invitation.
+  All wording follows the invitation's own language (field "language"), so an Arabic
+  invitation is fully Arabic even when the storefront is in English.
+{%- endcomment -%}
+{%- liquid
+  assign m = metaobject
+  assign s = section.settings
+  assign design = m.design.value | default: 'ivoire'
+  assign lang = m.language.value | default: 'en'
+  assign dir = 'ltr'
+  if lang == 'ar'
+    assign dir = 'rtl'
+  endif
+  assign k = 'invitation.' | append: lang | append: '.'
+
+  assign p1 = m.partner_one.value
+  assign p2 = m.partner_two.value
+  assign amp = k | append: 'and' | t
+  assign names = p1 | append: ' ' | append: amp | append: ' ' | append: p2
+  assign i1 = p1 | slice: 0
+  assign i2 = p2 | slice: 0
+
+  assign ds = m.event_date.value
+  assign time = m.event_time.value | default: '19:00'
+  assign t_parts = time | split: ':'
+  assign h24 = t_parts[0] | plus: 0
+  assign minutes = t_parts[1] | default: '00'
+  assign h12 = h24 | modulo: 12
+  if h12 == 0
+    assign h12 = 12
+  endif
+  if lang == 'ar'
+    if h24 >= 12
+      assign meridiem = 'مساءً'
+    else
+      assign meridiem = 'صباحًا'
+    endif
+    assign months = 'يناير,فبراير,مارس,أبريل,مايو,يونيو,يوليو,أغسطس,سبتمبر,أكتوبر,نوفمبر,ديسمبر' | split: ','
+    assign weekdays = 'الأحد,الاثنين,الثلاثاء,الأربعاء,الخميس,الجمعة,السبت' | split: ','
+    assign mi = ds | date: '%-m' | minus: 1
+    assign wi = ds | date: '%w' | plus: 0
+    assign month_name = months[mi]
+    assign weekday_name = weekdays[wi]
+  else
+    if h24 >= 12
+      assign meridiem = 'PM'
+    else
+      assign meridiem = 'AM'
+    endif
+    assign month_name = ds | date: '%B'
+    assign weekday_name = ds | date: '%A'
+  endif
+  assign day_num = ds | date: '%-d'
+  assign year_num = ds | date: '%Y'
+  assign time_label = h12 | append: ':' | append: minutes | append: ' ' | append: meridiem
+  assign iso = ds | date: '%Y-%m-%d' | append: 'T' | append: time
+
+  assign rsvp_mode = m.rsvp_mode.value | default: 'form'
+  assign max_guests = m.rsvp_max_guests.value | default: 2
+  assign show_envelope = settings.invitation_envelope
+  if request.design_mode
+    assign show_envelope = false
+  endif
+  assign alt = m.alternate_invitation.value
+  assign is_demo = false
+  if m.is_demo.value == true
+    assign is_demo = true
+  endif
+-%}
+
+{%- capture date_long -%}{% render 'inv-date', date: ds, lang: lang, weekday: true %}{%- endcapture -%}
+{%- capture day_display -%}{% render 'inv-digits', value: day_num, lang: lang %}{%- endcapture -%}
+{%- capture year_display -%}{% render 'inv-digits', value: year_num, lang: lang %}{%- endcapture -%}
+{%- capture time_display -%}{% render 'inv-digits', value: time_label, lang: lang %}{%- endcapture -%}
+
+<div
+  class="inv inv--{{ design }}"
+  lang="{{ lang }}"
+  dir="{{ dir }}"
+  data-invitation
+  data-lang="{{ lang }}"
+  data-date="{{ iso }}"
+  data-names="{{ names | escape }}"
+  data-title="{{ k | append: 'wedding_of' | t: names: names | escape }}"
+  data-venue="{{ m.venue_name.value | escape }}{% if m.venue_address.value != blank %}, {{ m.venue_address.value | newline_to_br | replace: '<br />', ', ' | strip_newlines | escape }}{% endif %}"
+  data-demo="{{ is_demo }}"
+  data-hijri="{% if lang == 'ar' and m.show_hijri.value == true and m.date_note.value == blank %}true{% endif %}"
+>
+  {%- if show_envelope -%}
+    <div class="inv-envelope" data-envelope>
+      <div class="inv-envelope__scene">
+        <p class="inv-envelope__to">{{ k | append: 'you_are_invited' | t }}</p>
+        <div class="inv-envelope__env" data-envelope-open role="button" tabindex="0" aria-label="{{ k | append: 'tap_to_open' | t }}">
+          <div class="inv-envelope__back"></div>
+          <div class="inv-envelope__letter">
+            <span class="inv-envelope__letter-names">{{ p1 }} <span>{{ amp }}</span> {{ p2 }}</span>
+          </div>
+          <div class="inv-envelope__pocket"></div>
+          <div class="inv-envelope__flap-wrap"><div class="inv-envelope__flap"></div></div>
+          <span class="inv-envelope__seal" aria-hidden="true">
+            <span class="inv-envelope__seal-ring"></span>
+            <span class="inv-envelope__initials">{{ i1 }}<i>{{ amp }}</i>{{ i2 }}</span>
+          </span>
+        </div>
+        <p class="inv-envelope__hint">
+          <span class="inv-envelope__hint-dot" aria-hidden="true"></span>
+          {{ k | append: 'tap_to_open' | t }}
+        </p>
+      </div>
+    </div>
+  {%- endif -%}
+
+  <div class="inv-page" data-inv-page>
+    {%- comment -%} Floating controls {%- endcomment -%}
+    <div class="inv-controls">
+      {%- if alt -%}
+        <a class="inv-pill" href="{{ alt.system.url }}{% if show_envelope %}?open=1{% endif %}" hreflang="{{ alt.language.value }}" lang="{{ alt.language.value }}">
+          {{- k | append: 'switch_language' | t -}}
+        </a>
+      {%- endif -%}
+      {%- if m.music_url.value != blank -%}
+        <button type="button" class="inv-pill inv-pill--icon" data-music-toggle aria-pressed="false" aria-label="{{ 'accessibility.play_music' | t }}">
+          {% render 'icon', name: 'music', size: 18, class: 'inv-music-on' %}
+          {% render 'icon', name: 'music-off', size: 18, class: 'inv-music-off' %}
+        </button>
+        <audio src="{{ m.music_url.value }}" loop preload="none" data-music></audio>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} Hero {%- endcomment -%}
+    <header class="inv-hero">
+      <div class="inv-hero__bg" aria-hidden="true">
+        {%- if design == 'jardin' -%}
+          <span class="inv-hero__sprig inv-hero__sprig--start">{% render 'invitation-ornament', design: design, part: 'corner' %}</span>
+          <span class="inv-hero__sprig inv-hero__sprig--end">{% render 'invitation-ornament', design: design, part: 'corner' %}</span>
+        {%- elsif design == 'minuit' -%}
+          <span class="inv-stars"></span>
+          <span class="inv-corner inv-corner--ts">{% render 'invitation-ornament', design: design, part: 'corner' %}</span>
+          <span class="inv-corner inv-corner--te">{% render 'invitation-ornament', design: design, part: 'corner' %}</span>
+          <span class="inv-corner inv-corner--bs">{% render 'invitation-ornament', design: design, part: 'corner' %}</span>
+          <span class="inv-corner inv-corner--be">{% render 'invitation-ornament', design: design, part: 'corner' %}</span>
+        {%- elsif design == 'sable' -%}
+          <span class="inv-hero__horizon">{% render 'invitation-ornament', design: design, part: 'horizon' %}</span>
+        {%- endif -%}
+      </div>
+
+      <div class="inv-hero__frame">
+        {%- unless design == 'jardin' -%}
+          <div class="inv-hero__crest" data-inv-reveal>{% render 'invitation-ornament', design: design, part: 'crest' %}</div>
+        {%- endunless -%}
+
+        {%- if m.intro_line.value != blank -%}
+          <p class="inv-intro" data-inv-reveal>{{ m.intro_line.value | escape | newline_to_br }}</p>
+        {%- endif -%}
+
+        {%- liquid
+          assign message_first = false
+          if lang == 'ar' or m.hosts.value != blank
+            assign message_first = true
+          endif
+        -%}
+        {%- if m.hosts.value != blank -%}
+          <p class="inv-hosts" data-inv-reveal>{{ m.hosts.value | escape | newline_to_br }}</p>
+        {%- endif -%}
+        {%- if message_first and m.invitation_message.value != blank -%}
+          <p class="inv-message" data-inv-reveal>{{ m.invitation_message.value | escape | newline_to_br }}</p>
+        {%- endif -%}
+
+        <h1 class="inv-names" data-inv-reveal>
+          <span class="inv-names__one">{{ p1 }}</span>
+          <span class="inv-names__amp">{{ amp }}</span>
+          <span class="inv-names__two">{{ p2 }}</span>
+        </h1>
+
+        {%- if message_first == false and m.invitation_message.value != blank -%}
+          <p class="inv-message" data-inv-reveal>{{ m.invitation_message.value | escape | newline_to_br }}</p>
+        {%- endif -%}
+
+        <div class="inv-date" data-inv-reveal>
+          <span class="inv-date__side">{{ weekday_name }}</span>
+          <span class="inv-date__day">{{ day_display }}</span>
+          <span class="inv-date__side">{{ month_name }}</span>
+          <span class="inv-date__year">{{ year_display }}</span>
+          <span class="inv-date__time">{{ time_display }}</span>
+          {%- if m.date_note.value != blank -%}
+            <span class="inv-date__note">{{ m.date_note.value }}</span>
+          {%- elsif lang == 'ar' and m.show_hijri.value == true -%}
+            <span class="inv-date__note" data-hijri-target></span>
+          {%- endif -%}
+        </div>
+
+        <p class="inv-venue-line" data-inv-reveal>{{ m.venue_name.value }}</p>
+      </div>
+
+      <a class="inv-scroll-cue" href="#InvDetails" aria-label="{{ k | append: 'when' | t }}">
+        <span></span>
+      </a>
+    </header>
+
+    {%- if m.cover_photo.value -%}
+      <section class="inv-section inv-photo" data-inv-reveal>
+        <div class="inv-photo__frame">
+          {{ m.cover_photo.value | image_url: width: 1100 | image_tag: loading: 'lazy', sizes: '(min-width: 600px) 520px, 90vw', alt: names }}
+        </div>
+      </section>
+    {%- endif -%}
+
+    {%- if s.show_countdown -%}
+      <section class="inv-section inv-countdown" data-countdown aria-label="{{ k | append: 'countdown_heading' | t }}" data-inv-reveal>
+        <p class="inv-kicker">{{ k | append: 'countdown_heading' | t }}</p>
+        <div class="inv-countdown__grid" data-countdown-grid>
+          <div><span class="inv-countdown__num" data-cd="days">—</span><span class="inv-countdown__label">{{ k | append: 'days' | t }}</span></div>
+          <div><span class="inv-countdown__num" data-cd="hours">—</span><span class="inv-countdown__label">{{ k | append: 'hours' | t }}</span></div>
+          <div><span class="inv-countdown__num" data-cd="minutes">—</span><span class="inv-countdown__label">{{ k | append: 'minutes' | t }}</span></div>
+          <div><span class="inv-countdown__num" data-cd="seconds">—</span><span class="inv-countdown__label">{{ k | append: 'seconds' | t }}</span></div>
+        </div>
+        <p class="inv-countdown__done" data-countdown-done hidden
+          data-today="{{ k | append: 'today' | t | escape }}"
+          data-married="{{ k | append: 'married' | t | escape }}"></p>
+      </section>
+    {%- endif -%}
+
+    {%- comment -%} Details: when / where / dress code {%- endcomment -%}
+    <section class="inv-section inv-details" id="InvDetails">
+      <div class="inv-divider" aria-hidden="true" data-inv-reveal>{% render 'invitation-ornament', design: design, part: 'divider' %}</div>
+      <div class="inv-cards">
+        <article class="inv-card" data-inv-reveal>
+          <span class="inv-card__icon">{% render 'icon', name: 'calendar', size: 22 %}</span>
+          <h2 class="inv-card__title">{{ k | append: 'when' | t }}</h2>
+          <p class="inv-card__text">{{ date_long }}<br>{{ time_display }}</p>
+          {%- if s.show_calendar -%}
+            <div class="inv-calendar" data-calendar>
+              <button type="button" class="inv-button inv-button--ghost" data-calendar-toggle aria-expanded="false">
+                {{ k | append: 'add_to_calendar' | t }}
+              </button>
+              <div class="inv-calendar__menu" data-calendar-menu hidden>
+                <button type="button" data-calendar-ics>{{ k | append: 'calendar_apple' | t }}</button>
+                <a href="#" data-calendar-google target="_blank" rel="noopener">{{ k | append: 'calendar_google' | t }}</a>
+              </div>
+            </div>
+          {%- endif -%}
+        </article>
+
+        <article class="inv-card" data-inv-reveal>
+          <span class="inv-card__icon">{% render 'icon', name: 'pin', size: 22 %}</span>
+          <h2 class="inv-card__title">{{ k | append: 'where' | t }}</h2>
+          <p class="inv-card__text">
+            <strong>{{ m.venue_name.value }}</strong>
+            {%- if m.venue_address.value != blank -%}<br>{{ m.venue_address.value | escape | newline_to_br }}{%- endif -%}
+          </p>
+          {%- if m.map_url.value != blank -%}
+            <a class="inv-button inv-button--ghost" href="{{ m.map_url.value }}" target="_blank" rel="noopener">{{ k | append: 'directions' | t }}</a>
+          {%- endif -%}
+        </article>
+
+        {%- if m.dress_code.value != blank -%}
+          <article class="inv-card" data-inv-reveal>
+            <span class="inv-card__icon">{% render 'icon', name: 'dress', size: 22 %}</span>
+            <h2 class="inv-card__title">{{ k | append: 'dress_code' | t }}</h2>
+            <p class="inv-card__text">{{ m.dress_code.value }}</p>
+          </article>
+        {%- endif -%}
+      </div>
+
+      {%- if m.show_map.value == true and m.venue_address.value != blank -%}
+        {%- capture map_query -%}{{ m.venue_name.value }}, {{ m.venue_address.value | strip_newlines }}{%- endcapture -%}
+        <div class="inv-map" data-inv-reveal>
+          <iframe
+            src="https://maps.google.com/maps?q={{ map_query | url_encode }}&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="{{ m.venue_name.value | escape }}"
+          ></iframe>
+        </div>
+      {%- endif -%}
+    </section>
+
+    {%- if m.schedule.value != blank -%}
+      <section class="inv-section inv-programme" aria-labelledby="InvProgramme">
+        <h2 class="inv-heading" id="InvProgramme" data-inv-reveal>{{ k | append: 'programme' | t }}</h2>
+        <ol class="inv-timeline" role="list">
+          {%- assign lines = m.schedule.value | newline_to_br | split: '<br />' -%}
+          {%- for line in lines -%}
+            {%- assign clean = line | strip_newlines | strip -%}
+            {%- if clean == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign parts = clean | split: '|' -%}
+            <li class="inv-timeline__item" data-inv-reveal>
+              {%- if parts.size > 1 -%}
+                <span class="inv-timeline__time">{{ parts[0] | strip }}</span>
+                <span class="inv-timeline__label">{{ parts[1] | strip }}</span>
+              {%- else -%}
+                <span class="inv-timeline__label">{{ clean }}</span>
+              {%- endif -%}
+            </li>
+          {%- endfor -%}
+        </ol>
+      </section>
+    {%- endif -%}
+
+    {%- if m.story.value != blank -%}
+      <section class="inv-section inv-story" data-inv-reveal>
+        <div class="inv-divider" aria-hidden="true">{% render 'invitation-ornament', design: design, part: 'divider' %}</div>
+        <h2 class="inv-heading">{{ k | append: 'story' | t }}</h2>
+        <p class="inv-story__text">{{ m.story.value | escape | newline_to_br }}</p>
+      </section>
+    {%- endif -%}
+
+    {%- unless rsvp_mode == 'none' -%}
+      <section class="inv-section inv-rsvp" id="rsvp" aria-labelledby="InvRsvp">
+        <div class="inv-rsvp__card" data-inv-reveal>
+          <p class="inv-kicker">{{ k | append: 'rsvp' | t }}</p>
+          <h2 class="inv-heading" id="InvRsvp">{{ k | append: 'rsvp_heading' | t }}</h2>
+          {%- if m.rsvp_deadline.value != blank -%}
+            {%- capture deadline -%}{% render 'inv-date', date: m.rsvp_deadline.value, lang: lang, weekday: false %}{%- endcapture -%}
+            <p class="inv-rsvp__deadline">{{ k | append: 'rsvp_by' | t: date: deadline }}</p>
+          {%- endif -%}
+
+          {%- capture rsvp_fields -%}
+            <div class="inv-field">
+              <label for="RsvpName">{{ k | append: 'name' | t }}</label>
+              <input id="RsvpName" type="text" name="contact[name]" autocomplete="name" required>
+            </div>
+            <fieldset class="inv-field inv-choice">
+              <legend>{{ k | append: 'attending' | t }}</legend>
+              <label><input type="radio" name="contact[Attending]" value="{{ k | append: 'accept' | t }}" data-attending="yes" checked> <span>{{ k | append: 'accept' | t }}</span></label>
+              <label><input type="radio" name="contact[Attending]" value="{{ k | append: 'decline' | t }}" data-attending="no"> <span>{{ k | append: 'decline' | t }}</span></label>
+            </fieldset>
+            <div class="inv-field" data-guests-field>
+              <label for="RsvpGuests">{{ k | append: 'guests' | t }}</label>
+              <select id="RsvpGuests" name="contact[Guests]">
+                {%- for n in (1..max_guests) -%}
+                  <option value="{{ n }}">{% render 'inv-digits', value: n, lang: lang %}</option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- endcapture -%}
+
+          {%- case rsvp_mode -%}
+            {%- when 'whatsapp' -%}
+              <form class="inv-rsvp__form" data-rsvp="whatsapp" data-whatsapp="{{ m.rsvp_whatsapp.value | remove: '+' | remove: ' ' }}"
+                data-message="{{ k | append: 'whatsapp_message' | t | escape }}">
+                {{ rsvp_fields }}
+                <button type="submit" class="inv-button">{% render 'icon', name: 'whatsapp', size: 18 %} {{ k | append: 'whatsapp_reply' | t }}</button>
+              </form>
+            {%- when 'link' -%}
+              <a class="inv-button" href="{{ m.rsvp_link.value }}" target="_blank" rel="noopener">{{ k | append: 'rsvp_link' | t }}</a>
+            {%- when 'sheet' -%}
+              <form class="inv-rsvp__form" data-rsvp="sheet" action="{{ m.rsvp_link.value }}" method="post">
+                <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }}">
+                {{ rsvp_fields }}
+                <div class="inv-field">
+                  <label for="RsvpMessage">{{ k | append: 'message' | t }}</label>
+                  <textarea id="RsvpMessage" name="contact[Message]" rows="3"></textarea>
+                </div>
+                <button type="submit" class="inv-button">{{ k | append: 'send' | t }}</button>
+              </form>
+            {%- else -%}
+              {%- form 'contact', id: 'RSVP', class: 'inv-rsvp__form' -%}
+                {%- if form.posted_successfully? -%}
+                  <p class="inv-rsvp__thanks" role="status">{{ k | append: 'thanks' | t }}</p>
+                {%- else -%}
+                  <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }} — {{ names }}">
+                  <input type="hidden" name="contact[Event date]" value="{{ ds | date: '%Y-%m-%d' }}">
+                  {{ rsvp_fields }}
+                  <div class="inv-field">
+                    <label for="RsvpEmail">{{ k | append: 'email' | t }}</label>
+                    <input id="RsvpEmail" type="email" name="contact[email]" autocomplete="email" required dir="ltr">
+                  </div>
+                  <div class="inv-field">
+                    <label for="RsvpMessage">{{ k | append: 'message' | t }}</label>
+                    <textarea id="RsvpMessage" name="contact[body]" rows="3"></textarea>
+                  </div>
+                  {%- if form.errors -%}<p class="inv-rsvp__error">{{ form.errors | default_errors }}</p>{%- endif -%}
+                  <button type="submit" class="inv-button">{{ k | append: 'send' | t }}</button>
+                {%- endif -%}
+              {%- endform -%}
+          {%- endcase -%}
+          <p class="inv-rsvp__status" data-rsvp-status role="status" hidden
+            data-thanks="{{ k | append: 'thanks' | t | escape }}"
+            data-thanks-decline="{{ k | append: 'thanks_decline' | t | escape }}"
+            data-demo="{{ k | append: 'demo_notice' | t | escape }}"
+            data-error="{{ k | append: 'error' | t | escape }}"
+            data-accept="{{ k | append: 'accept' | t | escape }}"
+            data-decline="{{ k | append: 'decline' | t | escape }}"></p>
+        </div>
+      </section>
+    {%- endunless -%}
+
+    <footer class="inv-footer">
+      <div class="inv-footer__monogram" aria-hidden="true">
+        <span>{{ i1 }}</span><i>{{ amp }}</i><span>{{ i2 }}</span>
+      </div>
+      {%- if m.closing_line.value != blank -%}
+        <p class="inv-footer__closing">{{ m.closing_line.value }}</p>
+      {%- endif -%}
+      {%- if s.show_share -%}
+        <button type="button" class="inv-button inv-button--ghost" data-inv-share>
+          {% render 'icon', name: 'share', size: 16 %} {{ k | append: 'share' | t }}
+        </button>
+      {%- endif -%}
+      {%- if settings.invitation_credit -%}
+        <a class="inv-footer__credit" href="{{ shop.url }}" target="_blank" rel="noopener">
+          {% render 'brand-logo', variant: 'mark' %}
+          <span>{{ k | append: 'made_with' | t }}</span>
+        </a>
+      {%- endif -%}
+    </footer>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Invitation",
+  "tag": "section",
+  "class": "section-invitation",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Content comes from the invitation entry (Content → Metaobjects → Invitation). The envelope animation and credit line are in Theme settings → Invitations."
+    },
+    { "type": "checkbox", "id": "show_countdown", "label": "Show countdown", "default": true },
+    { "type": "checkbox", "id": "show_calendar", "label": "Show “Add to calendar”", "default": true },
+    { "type": "checkbox", "id": "show_share", "label": "Show share button", "default": true }
+  ]
+}
+{% endschema %}

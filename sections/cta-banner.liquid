@@ -1,0 +1,55 @@
+{%- liquid
+  assign s = section.settings
+  assign heading = s.heading
+  if heading == blank
+    assign heading = 'sections.cta.heading' | t
+  endif
+  assign text = s.text
+  if text == blank
+    assign text = 'sections.cta.text' | t
+  endif
+  assign button_label = s.button_label
+  if button_label == blank
+    assign button_label = 'sections.cta.button' | t
+  endif
+  assign button_link = s.button_link
+  if button_link == blank
+    assign button_link = collections['invitations'].url | default: routes.all_products_collection_url
+  endif
+-%}
+<section class="cta-banner{% if s.background == 'alt' %} section--alt{% elsif s.background == 'ink' %} section--ink{% endif %}">
+  <div class="cta-banner__arch" aria-hidden="true"></div>
+  <div class="page-width cta-banner__inner">
+    <span class="cta-banner__mark" data-reveal>{% render 'brand-logo', variant: 'mark' %}</span>
+    <h2 class="h1 cta-banner__heading" data-reveal>{{ heading }}</h2>
+    <p class="lede cta-banner__text" data-reveal>{{ text }}</p>
+    <div data-reveal>
+      <a class="btn{% if s.background == 'ink' %} btn--light{% endif %}" href="{{ button_link }}">{{ button_label }} {% render 'icon', name: 'arrow', size: 18 %}</a>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Call to action",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "text", "id": "button_label", "label": "Button label" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    {
+      "type": "select",
+      "id": "background",
+      "label": "Background",
+      "options": [
+        { "value": "default", "label": "Cream" },
+        { "value": "alt", "label": "Deeper cream" },
+        { "value": "ink", "label": "Ink" }
+      ],
+      "default": "alt"
+    }
+  ],
+  "presets": [{ "name": "Call to action" }]
+}
+{% endschema %}

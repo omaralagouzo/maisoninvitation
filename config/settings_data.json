@@ -1,0 +1,25 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "logo_width": 150,
+      "color_background": "#F7F3EC",
+      "color_background_alt": "#EFE8DC",
+      "color_surface": "#FBF9F5",
+      "color_text": "#1F1D1A",
+      "color_accent": "#A9824F",
+      "color_accent_text": "#876740",
+      "color_footer_background": "#1F1D1A",
+      "color_footer_text": "#F7F3EC",
+      "type_heading_scale": 100,
+      "type_body_scale": 100,
+      "page_width": 1320,
+      "button_shape": "square",
+      "animations_reveal": true,
+      "paper_texture": true,
+      "currency_code_enabled": true,
+      "invitation_credit": true,
+      "invitation_envelope": true
+    }
+  }
+}

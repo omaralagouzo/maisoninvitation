@@ -1,0 +1,28 @@
+{%- comment -%}
+  Long date in the invitation's language, independent of the storefront language.
+  Params: date (YYYY-MM-DD or date value), lang ('en' | 'ar'), weekday (true/false)
+  en → "Thursday, 15 April 2027"   ar → "الخميس ١٥ أبريل ٢٠٢٧"
+{%- endcomment -%}
+{%- liquid
+  assign day = date | date: '%-d'
+  assign year = date | date: '%Y'
+  if lang == 'ar'
+    assign months = 'يناير,فبراير,مارس,أبريل,مايو,يونيو,يوليو,أغسطس,سبتمبر,أكتوبر,نوفمبر,ديسمبر' | split: ','
+    assign days = 'الأحد,الاثنين,الثلاثاء,الأربعاء,الخميس,الجمعة,السبت' | split: ','
+    assign mi = date | date: '%-m' | minus: 1
+    assign wi = date | date: '%w' | plus: 0
+    assign month = months[mi]
+    assign wd = days[wi]
+  else
+    assign month = date | date: '%B'
+    assign wd = date | date: '%A'
+  endif
+-%}
+{%- capture out -%}
+  {%- if lang == 'ar' -%}
+    {%- if weekday %}{{ wd }} {% endif -%}{{ day }} {{ month }} {{ year }}
+  {%- else -%}
+    {%- if weekday %}{{ wd }}, {% endif -%}{{ day }} {{ month }} {{ year }}
+  {%- endif -%}
+{%- endcapture -%}
+{%- render 'inv-digits', value: out, lang: lang -%}

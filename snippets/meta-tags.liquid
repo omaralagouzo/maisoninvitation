@@ -1,0 +1,46 @@
+{%- comment -%}
+  SEO + social sharing tags. Invitation pages pass `title`, `description` and
+  `image` so a WhatsApp / iMessage preview shows the couple's names.
+{%- endcomment -%}
+{%- liquid
+  assign og_title = title | default: page_title | default: shop.name
+  assign og_description = description | default: page_description | default: shop.description
+  if og_description == blank
+    assign og_description = 'general.brand_tagline' | t
+  endif
+  assign og_type = 'website'
+  if request.page_type == 'product'
+    assign og_type = 'product'
+  elsif request.page_type == 'article'
+    assign og_type = 'article'
+  endif
+  assign og_image = image
+  if og_image == blank and page_image
+    assign og_image = page_image
+  endif
+  if og_image == blank and settings.share_image
+    assign og_image = settings.share_image
+  endif
+-%}
+<meta property="og:site_name" content="{{ shop.name }}">
+<meta property="og:url" content="{{ canonical_url }}">
+<meta property="og:title" content="{{ og_title | escape }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:description" content="{{ og_description | strip_html | escape }}">
+{%- if og_image -%}
+  <meta property="og:image" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image:secure_url" content="https:{{ og_image | image_url: width: 1200 }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="{{ 1200 | divided_by: og_image.aspect_ratio | round }}">
+{%- else -%}
+  <meta property="og:image" content="https:{{ 'share-default.jpg' | asset_url }}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+{%- endif -%}
+{%- if request.page_type == 'product' -%}
+  <meta property="og:price:amount" content="{{ product.price | money_without_currency | strip_html }}">
+  <meta property="og:price:currency" content="{{ cart.currency.iso_code }}">
+{%- endif -%}
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ og_title | escape }}">
+<meta name="twitter:description" content="{{ og_description | strip_html | escape }}">

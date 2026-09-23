@@ -1,0 +1,95 @@
+{%- comment -%}
+  Product card for an invitation design.
+  Params:
+    product   (required)
+    variant   optional — show this variant's image, price and link (e.g. the Arabic variant)
+    lang      optional — 'en' | 'ar'; picks the matching live demo + Arabic name
+    eager     optional — load image eagerly
+    index     optional — for reveal stagger
+
+  Image convention: the card uses the variant image; on hover it cross-fades to a product
+  image whose alt text contains "envelope" and the language name (e.g. "Ivoire envelope — Arabic").
+{%- endcomment -%}
+{%- liquid
+  assign v = variant | default: product.selected_or_first_available_variant
+  assign image = v.featured_image | default: product.featured_image
+  assign url = product.url
+  if variant
+    assign url = variant.url
+  endif
+
+  assign lang_name = 'English'
+  if lang == 'ar'
+    assign lang_name = 'Arabic'
+  endif
+  assign hover = nil
+  for img in product.images
+    if img.alt contains 'envelope' and img.alt contains lang_name
+      assign hover = img
+      break
+    endif
+  endfor
+
+  assign demo_key = 'demo_url_' | append: lang | default: 'demo_url_en'
+  if lang == blank
+    assign demo_key = 'demo_url_en'
+  endif
+  assign demo_url = product.metafields.maison[demo_key].value
+  assign subtitle = product.metafields.maison.subtitle.value
+  assign palette = product.metafields.maison.palette.value | split: ','
+
+  if variant
+    assign card_price = variant.price
+  else
+    assign card_price = product.price_min
+  endif
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+-%}
+{%- capture price -%}{% render 'money', amount: card_price %}{%- endcapture -%}
+<article class="card" data-reveal style="--reveal-delay: {{ index | default: 0 | times: 0.07 }}s">
+  <a class="card__media" href="{{ url }}" tabindex="-1" aria-hidden="true">
+    {%- if image -%}
+      {{ image | image_url: width: 900 | image_tag: loading: loading, sizes: '(min-width: 1100px) 25vw, (min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: image.alt | default: product.title, class: 'card__img' }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+    {%- endif -%}
+    {%- if hover -%}
+      {{ hover | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 1100px) 25vw, (min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: '', class: 'card__img--hover' }}
+    {%- endif -%}
+    {%- if product.type != blank -%}
+      <span class="card__badge">{{ product.type }}</span>
+    {%- endif -%}
+  </a>
+  <div class="card__body">
+    <div class="card__title-row">
+      <h3 class="card__title"><a href="{{ url }}">{{ product.title }}</a></h3>
+      {%- if lang == 'ar' and product.metafields.maison.name_ar != blank -%}
+        <span class="card__alt-name" lang="ar">{{ product.metafields.maison.name_ar.value }}</span>
+      {%- endif -%}
+    </div>
+    {%- if subtitle != blank -%}
+      <p class="card__meta">{{ subtitle }}</p>
+    {%- endif -%}
+    <div class="card__title-row">
+      <span class="card__price">{{ 'products.card.from' | t: price: price }}</span>
+      {%- if palette.size > 1 -%}
+        <span class="swatches" aria-hidden="true">
+          {%- for color in palette -%}<span class="swatch" style="background: {{ color | strip }}"></span>{%- endfor -%}
+        </span>
+      {%- endif -%}
+    </div>
+  </div>
+  <div class="card__actions">
+    <a class="btn btn--small btn--outline" href="{{ url }}">{{ 'products.card.customize' | t }}</a>
+    {%- if demo_url != blank -%}
+      <a class="card__demo" href="{{ demo_url }}" target="_blank" rel="noopener">
+        {{- 'products.card.live_demo' | t }}
+        {% render 'icon', name: 'arrow-up-end', size: 14 -%}
+        <span class="visually-hidden">({{ 'accessibility.external_link' | t }})</span>
+      </a>
+    {%- endif -%}
+  </div>
+</article>

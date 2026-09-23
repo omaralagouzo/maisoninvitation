@@ -1,0 +1,8 @@
+{%- if settings.favicon -%}
+  <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 64, height: 64 }}">
+  <link rel="apple-touch-icon" href="{{ settings.favicon | image_url: width: 180, height: 180 }}">
+{%- else -%}
+  <link rel="icon" type="image/svg+xml" href="{{ 'brand-favicon.svg' | asset_url }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ 'brand-favicon-32.png' | asset_url }}">
+  <link rel="apple-touch-icon" href="{{ 'brand-apple-touch-icon.png' | asset_url }}">
+{%- endif -%}

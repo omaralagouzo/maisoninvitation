@@ -1,0 +1,27 @@
+{%- comment -%} Design tokens from theme settings (Customize → Theme settings). {%- endcomment -%}
+{%- liquid
+  assign radius = '2px'
+  if settings.button_shape == 'pill'
+    assign radius = '999px'
+  elsif settings.button_shape == 'soft'
+    assign radius = '10px'
+  endif
+-%}
+{% style %}
+  :root {
+    --color-bg: {{ settings.color_background }};
+    --color-bg-alt: {{ settings.color_background_alt }};
+    --color-surface: {{ settings.color_surface }};
+    --color-ink: {{ settings.color_text }};
+    --color-ink-rgb: {{ settings.color_text | color_to_rgb | remove: 'rgb(' | remove: ')' }};
+    --color-accent: {{ settings.color_accent }};
+    --color-accent-text: {{ settings.color_accent_text }};
+    --color-footer-bg: {{ settings.color_footer_background }};
+    --color-footer-text: {{ settings.color_footer_text }};
+    --page-width: {{ settings.page_width }}px;
+    --logo-width: {{ settings.logo_width }}px;
+    --btn-radius: {{ radius }};
+    --heading-scale: {{ settings.type_heading_scale | divided_by: 100.0 }};
+    --body-scale: {{ settings.type_body_scale | divided_by: 100.0 }};
+  }
+{% endstyle %}

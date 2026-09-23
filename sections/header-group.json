@@ -1,0 +1,17 @@
+{
+  "type": "header",
+  "name": "Header group",
+  "sections": {
+    "header": {
+      "type": "header",
+      "settings": {
+        "invitations_collection": "invitations",
+        "mega_limit": 8,
+        "group_threshold": 8,
+        "sticky": true,
+        "show_cart": true
+      }
+    }
+  },
+  "order": ["header"]
+}

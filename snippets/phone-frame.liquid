@@ -1,0 +1,52 @@
+{%- comment -%}
+  Phone mockup showing a finished invitation.
+  Params:
+    mode      'scroll' (default) — auto-scrolls a tall screenshot in a loop (pauses on hover)
+              'live'             — interactive embed of a live invitation page (iframe)
+              'image'            — static screenshot
+    image     image object (from an image_picker) — optional
+    asset     theme asset filename used when `image` is blank
+    url       live invitation URL (required for 'live')
+    alt       alt text
+    width     CSS width, e.g. '300px' (optional)
+    duration  seconds for one scroll loop (optional)
+    eager     true to load immediately (above the fold)
+{%- endcomment -%}
+{%- liquid
+  assign mode = mode | default: 'scroll'
+  assign loading = 'lazy'
+  if eager
+    assign loading = 'eager'
+  endif
+  if image
+    assign src = image | image_url: width: 900
+  else
+    assign src = asset | asset_url
+  endif
+-%}
+<div
+  class="phone{% if mode == 'scroll' %} phone--animate{% endif %}"
+  style="{% if width %}--phone-w: {{ width }};{% endif %}{% if duration %} --scroll-duration: {{ duration }}s;{% endif %}"
+>
+  <div class="phone__screen">
+    <span class="phone__island" aria-hidden="true"></span>
+    {%- case mode -%}
+      {%- when 'live' -%}
+        <iframe
+          class="phone__iframe"
+          src="{{ url }}{% if url contains '?' %}&{% else %}?{% endif %}embed=1"
+          title="{{ alt | escape }}"
+          loading="{{ loading }}"
+        ></iframe>
+      {%- when 'image' -%}
+        <div class="phone__media">
+          <img src="{{ src }}" alt="{{ alt | escape }}" loading="{{ loading }}" decoding="async" width="780" height="1688">
+        </div>
+      {%- else -%}
+        <div class="phone__scroll">
+          <img src="{{ src }}" alt="{{ alt | escape }}" loading="{{ loading }}" decoding="async" width="780">
+        </div>
+    {%- endcase -%}
+    <span class="phone__glare" aria-hidden="true"></span>
+  </div>
+</div>

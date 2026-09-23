@@ -1,0 +1,14 @@
+{
+  "layout": "invitation",
+  "sections": {
+    "main": {
+      "type": "main-invitation",
+      "settings": {
+        "show_countdown": true,
+        "show_calendar": true,
+        "show_share": true
+      }
+    }
+  },
+  "order": ["main"]
+}

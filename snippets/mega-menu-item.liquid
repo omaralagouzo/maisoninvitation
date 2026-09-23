@@ -1,0 +1,14 @@
+{%- capture price -%}{% render 'money', amount: product.price_min %}{%- endcapture -%}
+<a href="{{ product.url }}" class="mega-item{% if compact %} mega-item--compact{% endif %}">
+  <span class="mega-item__media">
+    {%- if product.featured_image -%}
+      {{ product.featured_image | image_url: width: 480 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 200px, 40vw', alt: product.featured_image.alt | default: product.title }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'placeholder' }}
+    {%- endif -%}
+  </span>
+  <span class="mega-item__text">
+    <span class="mega-item__title">{{ product.title }}</span>
+    <span class="mega-item__meta">{{ 'products.card.from' | t: price: price }}</span>
+  </span>
+</a>

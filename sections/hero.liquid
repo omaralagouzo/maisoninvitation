@@ -1,0 +1,155 @@
+{%- liquid
+  assign s = section.settings
+  assign root = routes.root_url
+  if root == '/'
+    assign root = ''
+  endif
+
+  assign eyebrow = s.eyebrow
+  if eyebrow == blank
+    assign eyebrow = 'sections.hero.eyebrow' | t
+  endif
+  assign heading = s.heading
+  if heading == blank
+    assign heading = 'sections.hero.heading_html' | t
+  endif
+  assign text = s.text
+  if text == blank
+    assign text = 'sections.hero.text' | t
+  endif
+  assign button_label = s.button_label
+  if button_label == blank
+    assign button_label = 'sections.hero.button' | t
+  endif
+  assign button_link = s.button_link
+  if button_link == blank
+    assign button_link = collections['invitations'].url | default: routes.all_products_collection_url
+  endif
+  assign secondary_label = s.secondary_label
+  if secondary_label == blank
+    assign secondary_label = 'sections.hero.secondary' | t
+  endif
+  assign secondary_link = s.secondary_link
+  if secondary_link == blank
+    assign secondary_link = root | append: '/pages/how-it-works'
+  endif
+  assign demo_url = s.demo_url
+  if demo_url == blank
+    assign demo_url = root | append: '/pages/invitation/ivoire-en'
+  endif
+-%}
+
+<section class="hero" aria-labelledby="Hero-{{ section.id }}">
+  <div class="hero__inner page-width">
+    <div class="hero__content">
+      <p class="eyebrow eyebrow--rule" data-reveal>{{ eyebrow }}</p>
+      <h1 class="display hero__heading" id="Hero-{{ section.id }}" data-reveal style="--reveal-delay: .08s">{{ heading }}</h1>
+      <p class="lede hero__text" data-reveal style="--reveal-delay: .16s">{{ text }}</p>
+      <div class="hero__actions" data-reveal style="--reveal-delay: .24s">
+        <a class="btn" href="{{ button_link }}">
+          {{ button_label }}
+          {% render 'icon', name: 'arrow', size: 18 %}
+        </a>
+        <a class="link-arrow" href="{{ secondary_link }}">{{ secondary_label }}</a>
+      </div>
+      {%- if s.show_points -%}
+        <ul class="hero__points" role="list" data-reveal style="--reveal-delay: .32s">
+          <li>{% render 'icon', name: 'language', size: 18 %}{{ 'sections.hero.point_1' | t }}</li>
+          <li>{% render 'icon', name: 'check', size: 18 %}{{ 'sections.hero.point_2' | t }}</li>
+          <li>{% render 'icon', name: 'link', size: 18 %}{{ 'sections.hero.point_3' | t }}</li>
+        </ul>
+      {%- endif -%}
+    </div>
+
+    <div class="hero__visual">
+      <div class="hero__arch" aria-hidden="true"></div>
+      {%- if s.show_seal -%}
+        <img class="hero__seal" src="{{ 'brand-seal.svg' | asset_url }}" alt="" width="128" height="128" aria-hidden="true">
+      {%- endif -%}
+      <figure class="hero__phone" data-reveal style="--reveal-delay: .2s">
+        {% render 'phone-frame',
+          mode: s.demo_mode,
+          image: s.demo_image,
+          asset: 'demo-scroll-ivoire-en.jpg',
+          url: demo_url,
+          alt: s.demo_label,
+          duration: s.scroll_duration,
+          eager: true
+        %}
+        <figcaption class="hero__caption">
+          <span class="live-dot">{{ 'sections.hero.demo_caption' | t }} — {{ s.demo_label }}</span>
+          <a href="{{ demo_url }}" target="_blank" rel="noopener">{{ 'sections.hero.demo_open' | t }}</a>
+        </figcaption>
+      </figure>
+      {%- if s.show_chip -%}
+        <div class="hero__chip hero__chip--rsvp" aria-hidden="true">
+          {% render 'icon', name: 'envelope', size: 18 %}
+          <span>{{ 'sections.features.rsvp_title' | t }}</span>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "tag": "div",
+  "class": "section-hero",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Leave any text blank to use the default wording — it's translated into Arabic automatically."
+    },
+    { "type": "text", "id": "eyebrow", "label": "Small label", "placeholder": "Digital wedding invitations" },
+    { "type": "inline_richtext", "id": "heading", "label": "Headline", "placeholder": "It starts <em>here</em>", "info": "Italicise a word to set it in brass." },
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "text", "id": "button_label", "label": "Button label", "placeholder": "Start designing" },
+    { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to the invitations collection." },
+    { "type": "text", "id": "secondary_label", "label": "Secondary link label", "placeholder": "How it works" },
+    { "type": "url", "id": "secondary_link", "label": "Secondary link" },
+    { "type": "checkbox", "id": "show_points", "label": "Show highlights row", "default": true },
+    {
+      "type": "header",
+      "content": "Phone demo"
+    },
+    {
+      "type": "select",
+      "id": "demo_mode",
+      "label": "Demo style",
+      "options": [
+        { "value": "scroll", "label": "Auto-scrolling screenshot (recommended)" },
+        { "value": "image", "label": "Static screenshot" },
+        { "value": "live", "label": "Live interactive invitation" }
+      ],
+      "default": "scroll"
+    },
+    {
+      "type": "image_picker",
+      "id": "demo_image",
+      "label": "Screenshot",
+      "info": "A full-length mobile screenshot (e.g. 780px wide). Defaults to the Ivoire demo."
+    },
+    {
+      "type": "url",
+      "id": "demo_url",
+      "label": "Live demo link",
+      "info": "A demo invitation page, e.g. /pages/invitation/ivoire-en. Used for the “Open full demo” link and the live style."
+    },
+    { "type": "text", "id": "demo_label", "label": "Demo name", "default": "Ivoire" },
+    {
+      "type": "range",
+      "id": "scroll_duration",
+      "min": 14,
+      "max": 60,
+      "step": 2,
+      "unit": "s",
+      "label": "Scroll loop length",
+      "default": 30
+    },
+    { "type": "checkbox", "id": "show_seal", "label": "Show wax seal", "default": true },
+    { "type": "checkbox", "id": "show_chip", "label": "Show floating RSVP badge", "default": true }
+  ],
+  "presets": [{ "name": "Hero" }]
+}
+{% endschema %}

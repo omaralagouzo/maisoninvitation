@@ -1,0 +1,161 @@
+{%- liquid
+  assign tagline = section.settings.tagline
+  if tagline == blank
+    assign tagline = 'general.brand_tagline' | t
+  endif
+  assign root = routes.root_url
+  if root == '/'
+    assign root = ''
+  endif
+  assign all_coll = collections['invitations']
+  if all_coll == blank
+    assign all_coll = collections['all']
+  endif
+  assign contact_email = settings.contact_email | default: shop.email
+-%}
+<footer class="site-footer" data-reveal>
+  <div class="site-footer__watermark" aria-hidden="true">{% render 'brand-logo', variant: 'mark' %}</div>
+  <div class="page-width">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <a href="{{ routes.root_url }}" class="site-footer__logo" aria-label="{{ shop.name }}">
+          {% render 'brand-logo', variant: 'full' %}
+        </a>
+        <p class="site-footer__tagline">{{ tagline }}</p>
+        {%- render 'social-links', class: 'site-footer__social' -%}
+      </div>
+
+      <div class="site-footer__col">
+        <p class="site-footer__heading">{{ 'footer.shop' | t }}</p>
+        <ul class="site-footer__links" role="list">
+          {%- if section.settings.menu_shop != blank and section.settings.menu_shop.links.size > 0 -%}
+            {%- for link in section.settings.menu_shop.links -%}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {%- endfor -%}
+          {%- else -%}
+            <li><a href="{{ all_coll.url }}">{{ 'footer.all_invitations' | t }}</a></li>
+            <li><a href="{{ root }}/pages/how-it-works">{{ 'header.how_it_works' | t }}</a></li>
+            <li><a href="{{ routes.account_url }}">{{ 'footer.track' | t }}</a></li>
+          {%- endif -%}
+        </ul>
+      </div>
+
+      <div class="site-footer__col">
+        <p class="site-footer__heading">{{ 'footer.help' | t }}</p>
+        <ul class="site-footer__links" role="list">
+          {%- if section.settings.menu_help != blank and section.settings.menu_help.links.size > 0 -%}
+            {%- for link in section.settings.menu_help.links -%}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {%- endfor -%}
+          {%- else -%}
+            <li><a href="{{ root }}/pages/faq">{{ 'footer.faq' | t }}</a></li>
+            <li><a href="{{ root }}/pages/contact">{{ 'footer.contact' | t }}</a></li>
+            <li><a href="{{ root }}/pages/about">{{ 'footer.about' | t }}</a></li>
+          {%- endif -%}
+          {%- if settings.whatsapp_number != blank -%}
+            <li>
+              <a href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' }}" target="_blank" rel="noopener">
+                {{- 'footer.whatsapp' | t -}}
+              </a>
+            </li>
+          {%- endif -%}
+          {%- if contact_email != blank -%}
+            <li><a href="mailto:{{ contact_email }}">{{ contact_email }}</a></li>
+          {%- endif -%}
+        </ul>
+      </div>
+
+      {%- if section.settings.show_newsletter -%}
+        <div class="site-footer__newsletter">
+          <p class="site-footer__heading">{{ 'footer.newsletter_heading' | t }}</p>
+          <p class="site-footer__text">{{ 'footer.newsletter_text' | t }}</p>
+          {%- form 'customer', id: 'FooterNewsletter', class: 'newsletter-form' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            {%- if form.posted_successfully? -%}
+              <p class="newsletter-form__success" role="status">{% render 'icon', name: 'check', size: 18 %} {{ 'footer.subscribed' | t }}</p>
+            {%- else -%}
+              <div class="newsletter-form__field">
+                <label class="visually-hidden" for="FooterNewsletter-email">{{ 'footer.email' | t }}</label>
+                <input
+                  id="FooterNewsletter-email"
+                  type="email"
+                  name="contact[email]"
+                  autocomplete="email"
+                  placeholder="{{ 'footer.email' | t }}"
+                  required
+                >
+                <button type="submit" class="newsletter-form__button" aria-label="{{ 'footer.subscribe' | t }}">
+                  {% render 'icon', name: 'arrow', size: 18 %}
+                </button>
+              </div>
+              {%- if form.errors -%}
+                <p class="form-error">{{ form.errors | default_errors }}</p>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="site-footer__bottom">
+      <p class="site-footer__copyright">
+        &copy; {{ 'now' | date: '%Y' }} {{ shop.name }}
+      </p>
+      {%- if shop.policies.size > 0 -%}
+        <ul class="site-footer__policies" role="list" aria-label="{{ 'footer.policies' | t }}">
+          {%- for policy in shop.policies -%}
+            <li><a href="{{ policy.url }}">{{ policy.title }}</a></li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+      {%- if section.settings.show_payment_icons and shop.enabled_payment_types.size > 0 -%}
+        <ul class="site-footer__payments" role="list" aria-label="{{ 'footer.payments' | t }}">
+          {%- for type in shop.enabled_payment_types -%}
+            <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "settings": [
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "placeholder": "Digital wedding invitations, crafted in English and Arabic.",
+      "info": "Leave blank to use the translated default."
+    },
+    {
+      "type": "link_list",
+      "id": "menu_shop",
+      "label": "“Shop” menu",
+      "info": "Optional. Defaults to All invitations, How it works and Your account."
+    },
+    {
+      "type": "link_list",
+      "id": "menu_help",
+      "label": "“Help” menu",
+      "info": "Optional. Defaults to Questions, Contact and About."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show newsletter signup",
+      "default": true,
+      "info": "Subscribers appear in Customers with the tag “newsletter” and email marketing consent."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

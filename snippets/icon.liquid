@@ -1,0 +1,92 @@
+{%- comment -%}
+  Line icons (24 × 24, 1.5px stroke, currentColor).
+  Usage: {% render 'icon', name: 'globe' %}  ·  optional: size (px), class
+  Directional icons (arrow, chevron-end) mirror automatically in right-to-left layouts.
+{%- endcomment -%}
+{%- liquid
+  assign s = size | default: 20
+  assign flip = ''
+  if name == 'arrow' or name == 'chevron-end' or name == 'arrow-up-end'
+    assign flip = ' icon--flip-rtl'
+  endif
+-%}
+<svg class="icon icon--{{ name }}{{ flip }}{% if class %} {{ class }}{% endif %}" width="{{ s }}" height="{{ s }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {%- case name -%}
+    {%- when 'globe' -%}
+      <circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/>
+    {%- when 'user' -%}
+      <circle cx="12" cy="8.5" r="3.75"/><path d="M4.5 20c.9-3.6 3.9-5.75 7.5-5.75S18.6 16.4 19.5 20"/>
+    {%- when 'bag' -%}
+      <path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/>
+    {%- when 'menu' -%}
+      <path d="M4 8h16M4 16h16"/>
+    {%- when 'close' -%}
+      <path d="M6 6l12 12M18 6 6 18"/>
+    {%- when 'chevron-down' -%}
+      <path d="m7 10 5 5 5-5"/>
+    {%- when 'chevron-end' -%}
+      <path d="m10 7 5 5-5 5"/>
+    {%- when 'arrow' -%}
+      <path d="M4 12h15M14 7l5 5-5 5"/>
+    {%- when 'arrow-up-end' -%}
+      <path d="M7 17 17 7M9 7h8v8"/>
+    {%- when 'check' -%}
+      <path d="m5 12.5 4.5 4.5L19 7.5"/>
+    {%- when 'plus' -%}
+      <path d="M12 5v14M5 12h14"/>
+    {%- when 'minus' -%}
+      <path d="M5 12h14"/>
+    {%- when 'search' -%}
+      <circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.4-4.4"/>
+    {%- when 'envelope' -%}
+      <rect x="3" y="5.5" width="18" height="13" rx="1"/><path d="m3.5 6.5 8.5 7 8.5-7"/>
+    {%- when 'seal' -%}
+      <circle cx="12" cy="12" r="7.5"/><path d="M8.5 10.5 12 13.5l3.5-3M8.5 10.5V15h7v-4.5"/>
+    {%- when 'heart' -%}
+      <path d="M12 19.5s-7.5-4.4-7.5-9.8A4.2 4.2 0 0 1 12 7.2a4.2 4.2 0 0 1 7.5 2.5c0 5.4-7.5 9.8-7.5 9.8Z"/>
+    {%- when 'calendar' -%}
+      <rect x="4" y="5.5" width="16" height="14.5" rx="1.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>
+    {%- when 'pin' -%}
+      <path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 1 1 13 0c0 5.4-6.5 11-6.5 11Z"/><circle cx="12" cy="10" r="2.3"/>
+    {%- when 'clock' -%}
+      <circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>
+    {%- when 'music' -%}
+      <path d="M9 18V6.5l10-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/>
+    {%- when 'music-off' -%}
+      <path d="M9 18V6.5l10-2V16"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/><path d="M3.5 3.5l17 17"/>
+    {%- when 'share' -%}
+      <path d="M12 15V4M8 7.5 12 4l4 3.5"/><path d="M6 11.5H5v8.5h14v-8.5h-1"/>
+    {%- when 'link' -%}
+      <path d="M10 14a4 4 0 0 0 5.7 0l3-3A4 4 0 0 0 13 5.3l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/>
+    {%- when 'sparkle' -%}
+      <path d="M12 3.5c.6 4.3 2.2 5.9 6.5 6.5-4.3.6-5.9 2.2-6.5 6.5-.6-4.3-2.2-5.9-6.5-6.5 4.3-.6 5.9-2.2 6.5-6.5Z"/><path d="M18.5 16.5c.2 1.3.7 1.8 2 2-1.3.2-1.8.7-2 2-.2-1.3-.7-1.8-2-2 1.3-.2 1.8-.7 2-2Z"/>
+    {%- when 'language' -%}
+      <path d="M3.5 6h9M8 4v2c0 4-2.2 7-4.5 8.5M5.5 9c1 2.3 3 4 5.5 5"/><path d="m12.5 20 4-9.5 4 9.5M14 17h5"/>
+    {%- when 'list' -%}
+      <path d="M9 7h11M9 12h11M9 17h11"/><circle cx="4.75" cy="7" r=".75"/><circle cx="4.75" cy="12" r=".75"/><circle cx="4.75" cy="17" r=".75"/>
+    {%- when 'dress' -%}
+      <path d="M9 3.5h6l-1.2 4 4.7 12.5h-13L10.2 7.5 9 3.5Z"/><path d="M10.2 7.5h3.6"/>
+    {%- when 'message' -%}
+      <path d="M4.5 5.5h15v10h-9l-4 3.5v-3.5h-2v-10Z"/>
+    {%- when 'lock' -%}
+      <rect x="5" y="10.5" width="14" height="9.5" rx="1.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/>
+    {%- when 'gift' -%}
+      <rect x="4" y="9" width="16" height="11" rx="1"/><path d="M3 9h18M12 9v11M12 9S10.5 4.5 8 5.2 9 9 12 9Zm0 0s1.5-4.5 4-3.8S15 9 12 9Z"/>
+    {%- when 'star' -%}
+      <path d="m12 4 2.4 5 5.4.6-4 3.7 1.1 5.3L12 16l-4.9 2.6 1.1-5.3-4-3.7 5.4-.6L12 4Z"/>
+    {%- when 'phone' -%}
+      <rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/>
+    {%- when 'whatsapp' -%}
+      <path d="M4.5 19.5 5.6 16A8 8 0 1 1 8.4 18.6l-3.9.9Z"/><path d="M9.3 8.6c.2-.5.5-.5.8-.5h.5c.2 0 .4.1.5.4l.7 1.7c.1.2 0 .4-.1.6l-.5.6c-.1.2-.1.4 0 .5a6 6 0 0 0 2.8 2.4c.2.1.4 0 .5-.1l.6-.7c.2-.2.4-.2.6-.1l1.6.8c.2.1.3.3.3.5 0 .6-.3 1.3-.9 1.6-.6.3-1.5.4-2.6 0a9 9 0 0 1-4.5-4.2c-.6-1.2-.5-2.2-.3-2.5Z"/>
+    {%- when 'instagram' -%}
+      <rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/><circle cx="16.9" cy="7.1" r=".6" fill="currentColor"/>
+    {%- when 'tiktok' -%}
+      <path d="M14 4v10.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 4c.4 2.6 2 4.2 4.5 4.5"/>
+    {%- when 'pinterest' -%}
+      <circle cx="12" cy="12" r="8.5"/><path d="m10.5 20.3 1.8-7.3M10.7 13.7c.5 1 1.3 1.3 2.1 1.3 2 0 3.2-1.9 3.2-4.2 0-2.4-1.9-4-4.1-4C9.4 6.8 8 8.6 8 10.4c0 .9.3 1.7 1 2.1"/>
+    {%- when 'facebook' -%}
+      <path d="M14.5 20v-7h2.5l.4-3h-2.9V8.4c0-.9.3-1.4 1.5-1.4h1.5V4.3c-.3 0-1.2-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8V10H9v3h2.6v7"/>
+    {%- else -%}
+      <circle cx="12" cy="12" r="1.5"/>
+  {%- endcase -%}
+</svg>

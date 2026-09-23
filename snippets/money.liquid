@@ -1,0 +1,6 @@
+{%- comment -%} Formats an amount (in cents) honouring the "Show currency codes" setting. {%- endcomment -%}
+{%- if settings.currency_code_enabled -%}
+  {{- amount | money_with_currency -}}
+{%- else -%}
+  {{- amount | money -}}
+{%- endif -%}

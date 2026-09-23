@@ -1,0 +1,255 @@
+{%- liquid
+  assign coll = section.settings.invitations_collection
+  if coll == blank
+    assign coll = collections['invitations']
+  endif
+  if coll == blank or coll.products_count == 0
+    assign coll = collections['all']
+  endif
+
+  assign invitations_label = section.settings.invitations_label
+  if invitations_label == blank
+    assign invitations_label = 'header.invitations' | t
+  endif
+  assign how_label = section.settings.how_label
+  if how_label == blank
+    assign how_label = 'header.how_it_works' | t
+  endif
+  assign how_url = section.settings.how_it_works_link
+  if how_url == blank
+    assign how_url = routes.root_url | append: '/pages/how-it-works' | replace: '//', '/'
+  endif
+
+  if customer
+    assign account_url = routes.account_url
+    assign account_label = 'header.account' | t
+  else
+    assign account_url = routes.account_login_url
+    assign account_label = 'header.log_in' | t
+  endif
+-%}
+
+<header-menu class="site-header{% if section.settings.sticky %} site-header--sticky{% endif %}" data-header>
+  <div class="site-header__bar">
+    <div class="site-header__inner page-width">
+      <a href="{{ routes.root_url }}" class="site-header__logo" aria-label="{{ shop.name }}">
+        {%- if settings.logo -%}
+          {{ settings.logo | image_url: width: 520 | image_tag: alt: shop.name, class: 'site-header__logo-image', loading: 'eager' }}
+        {%- else -%}
+          {% render 'brand-logo' %}
+          <span class="visually-hidden">{{ shop.name }}</span>
+        {%- endif -%}
+      </a>
+
+      <nav class="site-nav" aria-label="{{ 'general.menu' | t }}">
+        <ul class="site-nav__list" role="list">
+          <li class="site-nav__item">
+            <button
+              type="button"
+              class="site-nav__link site-nav__trigger"
+              aria-expanded="false"
+              aria-controls="MegaMenu-{{ section.id }}"
+              data-dropdown-trigger="invitations"
+              data-hover
+            >
+              <span>{{ invitations_label }}</span>
+              {% render 'icon', name: 'chevron-down', size: 14, class: 'site-nav__chevron' %}
+            </button>
+          </li>
+          <li class="site-nav__item">
+            <a class="site-nav__link{% if request.path == how_url %} is-active{% endif %}" href="{{ how_url }}">{{ how_label }}</a>
+          </li>
+          <li class="site-nav__item">
+            <button
+              type="button"
+              class="site-nav__link site-nav__icon-button"
+              aria-expanded="false"
+              aria-controls="Localization-{{ section.id }}"
+              aria-label="{{ 'header.localization.label' | t }}"
+              data-dropdown-trigger="localization"
+            >
+              {% render 'icon', name: 'globe', size: 20 %}
+              <span class="site-nav__locale" aria-hidden="true">
+                {{- localization.language.iso_code | upcase }} · {{ localization.country.currency.iso_code -}}
+              </span>
+            </button>
+          </li>
+          <li class="site-nav__item">
+            <a class="site-nav__link" href="{{ account_url }}">{{ account_label }}</a>
+          </li>
+          {%- if section.settings.show_cart and cart.item_count > 0 -%}
+            <li class="site-nav__item">
+              <a class="site-nav__link site-nav__cart" href="{{ routes.cart_url }}" aria-label="{{ 'header.cart' | t }}, {{ 'header.cart_count' | t: count: cart.item_count }}">
+                {% render 'icon', name: 'bag', size: 20 %}
+                <span class="site-nav__cart-count" aria-hidden="true">{{ cart.item_count }}</span>
+              </a>
+            </li>
+          {%- endif -%}
+        </ul>
+      </nav>
+
+      <div class="site-header__mobile">
+        <button
+          type="button"
+          class="site-nav__icon-button"
+          aria-expanded="false"
+          aria-controls="Localization-{{ section.id }}"
+          aria-label="{{ 'header.localization.label' | t }}"
+          data-dropdown-trigger="localization"
+        >
+          {% render 'icon', name: 'globe', size: 22 %}
+        </button>
+        {%- if section.settings.show_cart and cart.item_count > 0 -%}
+          <a class="site-nav__icon-button site-nav__cart" href="{{ routes.cart_url }}" aria-label="{{ 'header.cart' | t }}, {{ 'header.cart_count' | t: count: cart.item_count }}">
+            {% render 'icon', name: 'bag', size: 22 %}
+            <span class="site-nav__cart-count" aria-hidden="true">{{ cart.item_count }}</span>
+          </a>
+        {%- endif -%}
+        <button
+          type="button"
+          class="site-nav__icon-button site-nav__menu-button"
+          aria-expanded="false"
+          aria-controls="Drawer-{{ section.id }}"
+          aria-label="{{ 'accessibility.open_menu' | t }}"
+          data-dropdown-trigger="drawer"
+        >
+          <span class="menu-icon" aria-hidden="true"><span></span><span></span></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {%- comment -%} Invitations mega-menu — built from product data, never hardcoded. {%- endcomment -%}
+  <div class="dropdown mega-menu" id="MegaMenu-{{ section.id }}" data-dropdown-panel="invitations" hidden>
+    {% render 'mega-menu', collection: coll, limit: section.settings.mega_limit, group_threshold: section.settings.group_threshold, how_url: how_url %}
+  </div>
+
+  <div class="dropdown localization-dropdown" id="Localization-{{ section.id }}" data-dropdown-panel="localization" hidden>
+    <div class="localization-dropdown__inner">
+      {% render 'localization-panel', form_id: 'HeaderLocalization' %}
+    </div>
+  </div>
+
+  {%- comment -%} Mobile drawer {%- endcomment -%}
+  <div class="drawer" id="Drawer-{{ section.id }}" data-dropdown-panel="drawer" hidden>
+    <nav class="drawer__inner" aria-label="{{ 'general.menu' | t }}">
+      <details class="drawer__group" open>
+        <summary class="drawer__link">
+          <span>{{ invitations_label }}</span>
+          {% render 'icon', name: 'chevron-down', size: 18 %}
+        </summary>
+        <ul class="drawer__products" role="list">
+          {%- for product in coll.products limit: section.settings.mega_limit -%}
+            <li>
+              <a href="{{ product.url }}" class="drawer__product">
+                <span class="drawer__thumb">
+                  {%- if product.featured_image -%}
+                    {{ product.featured_image | image_url: width: 160 | image_tag: loading: 'lazy', alt: product.title, sizes: '64px' }}
+                  {%- endif -%}
+                </span>
+                <span>
+                  <span class="drawer__product-title">{{ product.title }}</span>
+                  <span class="drawer__product-meta">{{ product.type }}</span>
+                </span>
+              </a>
+            </li>
+          {%- endfor -%}
+          <li>
+            <a href="{{ coll.url }}" class="link-arrow">{{ 'header.mega.view_all' | t }} {% render 'icon', name: 'arrow', size: 16 %}</a>
+          </li>
+        </ul>
+      </details>
+      <a class="drawer__link" href="{{ how_url }}">{{ how_label }}</a>
+      <a class="drawer__link" href="{{ account_url }}">{{ account_label }}</a>
+      {%- if cart.item_count > 0 -%}
+        <a class="drawer__link" href="{{ routes.cart_url }}">{{ 'header.cart' | t }} <span class="drawer__count">{{ cart.item_count }}</span></a>
+      {%- endif -%}
+      <div class="drawer__localization">
+        {% render 'localization-panel', form_id: 'DrawerLocalization' %}
+      </div>
+    </nav>
+  </div>
+  <div class="dropdown-scrim" data-dropdown-scrim hidden></div>
+</header-menu>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Right side, in order: Invitations (mega-menu), How it works, globe (language + currency), Log in. A bag icon appears once the cart has items."
+    },
+    {
+      "type": "header",
+      "content": "Invitations menu"
+    },
+    {
+      "type": "text",
+      "id": "invitations_label",
+      "label": "Label",
+      "placeholder": "Invitations",
+      "info": "Leave blank to use the translated default."
+    },
+    {
+      "type": "collection",
+      "id": "invitations_collection",
+      "label": "Products to show",
+      "info": "New products in this collection appear in the menu automatically. Defaults to the “invitations” collection."
+    },
+    {
+      "type": "range",
+      "id": "mega_limit",
+      "min": 2,
+      "max": 16,
+      "step": 1,
+      "label": "Maximum designs shown",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "group_threshold",
+      "min": 2,
+      "max": 24,
+      "step": 1,
+      "label": "Group by style when there are more than",
+      "info": "Designs are grouped by product type (e.g. Classic, Modern) once the collection grows past this number.",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "How it works"
+    },
+    {
+      "type": "text",
+      "id": "how_label",
+      "label": "Label",
+      "placeholder": "How it works"
+    },
+    {
+      "type": "url",
+      "id": "how_it_works_link",
+      "label": "Link",
+      "info": "Defaults to /pages/how-it-works."
+    },
+    {
+      "type": "header",
+      "content": "Behaviour"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky",
+      "label": "Sticky header",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart",
+      "label": "Show bag icon when the cart has items",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

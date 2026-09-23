@@ -1,0 +1,25 @@
+{%- liquid
+  assign has_social = false
+  if settings.social_instagram_link != blank or settings.social_tiktok_link != blank or settings.social_pinterest_link != blank or settings.social_facebook_link != blank or settings.whatsapp_number != blank
+    assign has_social = true
+  endif
+-%}
+{%- if has_social -%}
+  <ul class="social-links {{ class }}" role="list">
+    {%- if settings.social_instagram_link != blank -%}
+      <li><a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.social.instagram' | t }}">{% render 'icon', name: 'instagram' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_tiktok_link != blank -%}
+      <li><a href="{{ settings.social_tiktok_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.social.tiktok' | t }}">{% render 'icon', name: 'tiktok' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_pinterest_link != blank -%}
+      <li><a href="{{ settings.social_pinterest_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.social.pinterest' | t }}">{% render 'icon', name: 'pinterest' %}</a></li>
+    {%- endif -%}
+    {%- if settings.social_facebook_link != blank -%}
+      <li><a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener" aria-label="{{ 'general.social.facebook' | t }}">{% render 'icon', name: 'facebook' %}</a></li>
+    {%- endif -%}
+    {%- if settings.whatsapp_number != blank -%}
+      <li><a href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' }}" target="_blank" rel="noopener" aria-label="{{ 'general.social.whatsapp' | t }}">{% render 'icon', name: 'whatsapp' %}</a></li>
+    {%- endif -%}
+  </ul>
+{%- endif -%}

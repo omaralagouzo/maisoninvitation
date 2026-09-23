@@ -1,0 +1,79 @@
+<!doctype html>
+{%- comment -%}
+  Layout for live invitation pages (metaobject "invitation" → /pages/invitation/<handle>).
+  No store header/footer: the invitation is the whole experience.
+  Direction and language come from the invitation itself, not the storefront language.
+{%- endcomment -%}
+{%- liquid
+  assign m = metaobject
+  assign lang = m.language.value | default: 'en'
+  assign dir = 'ltr'
+  if lang == 'ar'
+    assign dir = 'rtl'
+  endif
+  assign design = m.design.value | default: 'ivoire'
+  case design
+    when 'minuit'
+      assign theme_color = '#111727'
+    when 'jardin'
+      assign theme_color = '#FBFAF6'
+    when 'sable'
+      assign theme_color = '#EFE3D1'
+    else
+      assign theme_color = '#F7F3EC'
+  endcase
+
+  assign k = 'invitation.' | append: lang | append: '.'
+  assign amp = k | append: 'and' | t
+  assign names = m.partner_one.value | append: ' ' | append: amp | append: ' ' | append: m.partner_two.value
+  assign title = k | append: 'wedding_of' | t: names: names
+  assign invited = k | append: 'you_are_invited' | t
+-%}
+{%- capture description -%}
+  {{- invited }} · {% render 'inv-date', date: m.event_date.value, lang: lang, weekday: false %} · {{ m.venue_name.value -}}
+{%- endcapture -%}
+<html lang="{{ lang }}" dir="{{ dir }}" class="inv-html">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="{{ theme_color }}">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="canonical" href="{{ canonical_url }}">
+    {% render 'favicon' %}
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description | strip | escape }}">
+    {%- liquid
+      assign share_image = m.cover_photo.value
+    -%}
+    <meta property="og:site_name" content="{{ shop.name }}">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ canonical_url }}">
+    <meta property="og:title" content="{{ title | escape }}">
+    <meta property="og:description" content="{{ description | strip | escape }}">
+    {%- if share_image -%}
+      <meta property="og:image" content="https:{{ share_image | image_url: width: 1200 }}">
+    {%- else -%}
+      <meta property="og:image" content="https:{{ 'invite-share-' | append: design | append: '.jpg' | asset_url }}">
+      <meta property="og:image:width" content="1200">
+      <meta property="og:image:height" content="630">
+    {%- endif -%}
+    <meta name="twitter:card" content="summary_large_image">
+
+    {% render 'fonts' %}
+    {% render 'fonts-invitation' %}
+    {{ 'invitation.css' | asset_url | stylesheet_tag }}
+    <script>
+      (function () {
+        var d = document.documentElement, q = location.search;
+        d.className += ' js';
+        if (/[?&]embed=1/.test(q)) d.className += ' inv-embed';
+        if (/[?&]open=1/.test(q) || location.hash) d.className += ' inv-skip-envelope';
+      })();
+    </script>
+    <script src="{{ 'invitation.js' | asset_url }}" defer></script>
+    {{ content_for_header }}
+  </head>
+  <body class="inv-body inv-body--{{ design }}">
+    {{ content_for_layout }}
+  </body>
+</html>
