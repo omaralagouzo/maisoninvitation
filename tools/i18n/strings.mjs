@@ -257,6 +257,7 @@ export default {
     update: ['Update', 'تحديث'],
     secure: ['Secure checkout by Shopify', 'دفع آمن عبر Shopify'],
     details: ['Your details', 'تفاصيلكم'],
+    rsvp_method: ['RSVP method', 'طريقة تأكيد الحضور'],
     digital_note: [
       'Digital product — nothing is shipped. We’ll email your private preview.',
       'منتج رقمي — لا يوجد شحن. سنرسل لك المعاينة الخاصة عبر البريد الإلكتروني.',
