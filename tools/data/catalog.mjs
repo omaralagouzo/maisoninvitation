@@ -17,7 +17,7 @@ export const INVITATION_DEFINITION = {
   urlHandle: 'invitation',
   displayNameKey: 'title',
   fields: [
-    { key: 'title', name: 'Internal title', type: 'single_line_text_field', description: 'e.g. "Leila & Adam — English". Only you see this.', required: true },
+    { key: 'title', name: 'Internal title', type: 'single_line_text_field', description: 'e.g. "Leila & Adam — English". Shown in admin (and as the SEO title); guests see the couple\'s names.', required: true },
     { key: 'design', name: 'Design', type: 'single_line_text_field', required: true, choices: ['ivoire', 'minuit', 'jardin', 'sable'], description: 'Which Maison design to render.' },
     { key: 'language', name: 'Language', type: 'single_line_text_field', required: true, choices: ['en', 'ar'], description: 'en = English (left-to-right), ar = Arabic (right-to-left).' },
     { key: 'partner_one', name: 'First name shown', type: 'single_line_text_field', required: true },

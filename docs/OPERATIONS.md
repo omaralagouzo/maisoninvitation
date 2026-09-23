@@ -26,7 +26,8 @@ The variant tells you the language: **English**, **Arabic** or **Bilingual**. Th
 * Untick **Demo invitation** (demo entries never send RSVPs).
 * **Handle** becomes the link, e.g. `leila-and-adam` → `yourdomain.com/pages/invitation/leila-and-adam`.
   Use something that isn't easy to guess if the couple wants privacy, e.g. `leila-adam-7k2`.
-  Invitation pages are hidden from Google (`noindex`).
+  Invitation pages tell search engines not to index them (`noindex`), but Shopify may still list them in the
+  store's `sitemap.xml`, which is another reason to use hard-to-guess handles.
 * Set status to **Active** and save.
 
 **3. Bilingual orders:** create **two** entries (one `en`, one `ar`) and link them to each other in the
