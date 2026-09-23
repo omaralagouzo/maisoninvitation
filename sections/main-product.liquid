@@ -1,4 +1,6 @@
 {%- comment -%}
+  On the Arabic storefront the Arabic variant is preselected (unless ?variant= is in the URL).
+
   Invitation product page with a 3-step wizard:
     1. Language (variant)  2. Details (line item properties)  3. Review + add-ons
   Line item property keys are kept in English on purpose (consistent in Shopify admin
@@ -9,6 +11,15 @@
 {%- liquid
   assign s = section.settings
   assign current_variant = product.selected_or_first_available_variant
+  if product.selected_variant == blank and request.locale.iso_code == 'ar'
+    for v in product.variants
+      assign tail = v.sku | upcase | slice: -3, 3
+      if tail == '-AR' and v.available
+        assign current_variant = v
+        break
+      endif
+    endfor
+  endif
   assign root = routes.root_url
   if root == '/'
     assign root = ''

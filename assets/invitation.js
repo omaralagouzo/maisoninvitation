@@ -203,7 +203,8 @@
         const button = form.querySelector('button[type="submit"]');
         button.disabled = true;
         try {
-          await fetch(form.action, { method: 'POST', mode: 'no-cors', body: new FormData(form) });
+          // url-encoded (not multipart) so Google Apps Script receives the fields in e.parameter
+          await fetch(form.action, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(new FormData(form)) });
           form.hidden = true;
           showStatus(thanks);
         } catch (_) {

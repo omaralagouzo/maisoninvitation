@@ -21,7 +21,7 @@
           <p class="eyebrow eyebrow--rule" data-reveal>{{ eyebrow }}</p>
           <h2 class="h1" id="Faq-{{ section.id }}" data-reveal>{{ heading }}</h2>
         {%- endif -%}
-        {%- if s.show_contact -%}
+        {%- if s.show_contact and s.layout != 'stacked' -%}
           <a class="link-arrow" href="{{ root }}/pages/contact" data-reveal>{{ 'sections.faq.more' | t }} {% render 'icon', name: 'arrow', size: 16 %}</a>
         {%- endif -%}
       </div>
@@ -50,6 +50,11 @@
             </div>
           </details>
         {%- endfor -%}
+        {%- if s.show_contact and s.layout == 'stacked' -%}
+          <p style="margin-block-start: 36px; text-align: center">
+            <a class="link-arrow" href="{{ root }}/pages/contact">{{ 'sections.faq.more' | t }} {% render 'icon', name: 'arrow', size: 16 %}</a>
+          </p>
+        {%- endif -%}
       </div>
     </div>
   </div>

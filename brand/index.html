@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Maison Brand Kit</title>
+  <meta name="description" content="Maison Invitation logo system, colours and typography.">
+  <link rel="icon" href="logo/favicon.svg">
+  <style>
+    @font-face { font-family: 'Fraunces'; src: url(../assets/font-fraunces-latin-normal-300-700.woff2) format('woff2'); font-weight: 300 700; }
+    @font-face { font-family: 'Fraunces'; font-style: italic; src: url(../assets/font-fraunces-latin-italic-300-700.woff2) format('woff2'); font-weight: 300 700; }
+    @font-face { font-family: 'Inter'; src: url(../assets/font-inter-latin-normal-300-700.woff2) format('woff2'); font-weight: 300 700; }
+    @font-face { font-family: 'Amiri'; src: url(../assets/font-amiri-arabic-normal-400.woff2) format('woff2'); unicode-range: U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFF; }
+    :root {
+      --cream: #F7F3EC; --ink: #1F1D1A; --brass: #A9824F; --brass-text: #876740; --deep: #EFE8DC;
+      --line: rgba(31, 29, 26, .12);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--cream); color: var(--ink); font: 16px/1.6 Inter, system-ui, sans-serif; }
+    main { max-width: 1180px; margin: auto; padding: 56px 20px 96px; }
+    h1, h2 { font-family: Fraunces, Georgia, serif; font-weight: 380; letter-spacing: -.02em; line-height: 1.05; margin: 0; }
+    h1 { font-size: clamp(2.6rem, 7vw, 5rem); }
+    h1 em { color: var(--brass); font-weight: 330; }
+    h2 { font-size: 2rem; margin: 72px 0 8px; }
+    .eyebrow { font-size: .72rem; letter-spacing: .24em; text-transform: uppercase; color: var(--brass-text); font-weight: 500; }
+    .lede { max-width: 42em; color: rgba(31, 29, 26, .72); font-size: 1.1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 24px; }
+    .tile { background: #fff8; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+    .tile .art { aspect-ratio: 4 / 3; display: grid; place-items: center; padding: 28px; }
+    .tile .art img { max-width: 100%; max-height: 100%; }
+    .tile .meta { padding: 12px 16px; border-top: 1px solid var(--line); font-size: .82rem; display: flex; justify-content: space-between; gap: 10px; }
+    .tile .meta a { color: var(--brass-text); }
+    .ink { background: var(--ink); } .creamy { background: var(--cream); } .deep { background: var(--deep); } .checker { background: repeating-conic-gradient(#e9e4dc 0 25%, #f4f0e9 0 50%) 0 0 / 20px 20px; }
+    .hero-logo { margin: 36px 0 12px; padding: clamp(28px, 6vw, 72px); background: #fff6; border: 1px solid var(--line); border-radius: 14px; display: grid; place-items: center; }
+    .hero-logo img { width: min(640px, 100%); }
+    .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-top: 24px; }
+    .sw { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+    .sw div { height: 110px; }
+    .sw p { margin: 0; padding: 10px 14px; font-size: .85rem; background: #fff8; }
+    .type { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 24px; }
+    .type > div { padding: 28px; background: #fff8; border: 1px solid var(--line); border-radius: 10px; }
+    .big-serif { font-family: Fraunces, serif; font-size: 3.4rem; line-height: 1; font-weight: 380; }
+    .big-sans { font-family: Inter, sans-serif; letter-spacing: .38em; text-transform: uppercase; color: var(--brass); font-size: 1.1rem; }
+    .big-ar { font-family: Amiri, serif; font-size: 2.6rem; line-height: 1.4; direction: rtl; }
+    ul.rules { padding-left: 18px; color: rgba(31, 29, 26, .8); }
+    @media (max-width: 520px) { .tile .meta { flex-direction: column; } }
+  </style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">Brand kit · v1</p>
+  <h1>Maison <em>Invitation</em></h1>
+  <p class="lede">The logo rebuilt as true vector artwork from the original Canva design, plus a family of enhanced versions for social, packaging and the product itself. All files are in <code>brand/logo/</code> (SVG) and <code>brand/logo/png/</code>.</p>
+  <div class="hero-logo"><img src="logo/logo-primary.svg" alt="Maison Invitation primary logo"></div>
+
+  <h2>Primary lockups</h2>
+  <p class="lede">Faithful to the original: the envelope flap doubles as the M.</p>
+  <div class="grid" id="primary"></div>
+
+  <h2>Enhanced versions</h2>
+  <p class="lede">New pieces built from the same mark: a wax seal, a sealed envelope icon, a stacked monogram and an arched badge that echoes the invitation designs.</p>
+  <div class="grid" id="enhanced"></div>
+
+  <h2>Colour</h2>
+  <div class="swatches">
+    <div class="sw"><div style="background:#F7F3EC"></div><p><b>Cream</b> #F7F3EC<br>Backgrounds</p></div>
+    <div class="sw"><div style="background:#1F1D1A"></div><p><b>Ink</b> #1F1D1A<br>Text · logo · buttons</p></div>
+    <div class="sw"><div style="background:#A9824F"></div><p><b>Brass</b> #A9824F<br>Accent · seals</p></div>
+    <div class="sw"><div style="background:#876740"></div><p><b>Brass (text)</b> #876740<br>Small text on cream</p></div>
+    <div class="sw"><div style="background:#EFE8DC"></div><p><b>Deep cream</b> #EFE8DC<br>Alternate sections</p></div>
+  </div>
+
+  <h2>Typography</h2>
+  <div class="type">
+    <div><p class="eyebrow">Display · Fraunces</p><p class="big-serif">It starts <em style="color:var(--brass)">here</em></p></div>
+    <div><p class="eyebrow">Label · Inter, tracked</p><p class="big-sans">Invitation</p><p style="margin:0;color:#0009">Body text is Inter at comfortable sizes.</p></div>
+    <div><p class="eyebrow">Arabic · Amiri</p><p class="big-ar">تبدأ الحكاية هنا</p></div>
+  </div>
+
+  <h2>Usage</h2>
+  <ul class="rules">
+    <li>Keep clear space around the logo equal to the height of the “A”.</li>
+    <li>Don’t stretch, outline, add shadows, or re-type the wordmark in another font.</li>
+    <li>On dark backgrounds or photos use the reversed or mono-white versions.</li>
+    <li>Minimum widths: lockup 120px · wordmark 90px · mark 16px.</li>
+  </ul>
+</main>
+<script>
+  const tiles = {
+    primary: [
+      ['logo-primary.svg', 'checker', 'Primary · transparent'],
+      ['logo-primary-on-cream.svg', 'creamy', 'On cream'],
+      ['logo-primary-on-ink.svg', 'ink', 'On ink'],
+      ['logo-primary-reversed.svg', 'ink', 'Reversed · transparent'],
+      ['logo-primary-mono-black.svg', 'creamy', 'Mono black'],
+      ['logo-primary-mono-white.svg', 'ink', 'Mono white'],
+      ['logo-wordmark.svg', 'creamy', 'Wordmark (header)'],
+      ['logo-wordmark-brass-mark.svg', 'creamy', 'Wordmark · brass mark'],
+      ['logo-square.svg', 'deep', 'Square 1000×1000'],
+      ['logo-square-ink.svg', 'deep', 'Square · ink'],
+      ['mark.svg', 'creamy', 'Mark'],
+      ['mark-brass.svg', 'creamy', 'Mark · brass'],
+    ],
+    enhanced: [
+      ['seal.svg', 'creamy', 'Wax seal · brass'],
+      ['seal-ink.svg', 'creamy', 'Wax seal · ink'],
+      ['mark-sealed.svg', 'creamy', 'Sealed envelope'],
+      ['app-icon.svg', 'deep', 'App / profile icon'],
+      ['app-icon-cream.svg', 'deep', 'App icon · cream'],
+      ['logo-stacked.svg', 'creamy', 'Stacked monogram'],
+      ['logo-stacked-on-ink.svg', 'ink', 'Stacked · on ink'],
+      ['logo-arched.svg', 'deep', 'Arched badge'],
+      ['mark-fine.svg', 'creamy', 'Fine line mark'],
+      ['favicon.svg', 'creamy', 'Favicon (adapts to dark mode)'],
+    ],
+  };
+  for (const [id, list] of Object.entries(tiles)) {
+    document.getElementById(id).innerHTML = list.map(([f, bg, label]) =>
+      `<figure class="tile" style="margin:0"><div class="art ${bg}"><img src="logo/${f}" alt="${label}"></div>
+       <figcaption class="meta"><span>${label}</span><span><a href="logo/${f}" download>SVG</a> · <a href="logo/png/${f.replace('.svg', '.png')}" download>PNG</a></span></figcaption></figure>`).join('');
+  }
+</script>
+</body>
+</html>

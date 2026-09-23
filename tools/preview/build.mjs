@@ -178,7 +178,11 @@ async function main() {
 
   // assets + images
   fs.cpSync(path.join(THEME, 'assets'), path.join(OUT, 'assets'), { recursive: true });
-  if (fs.existsSync(MEDIA_DIR)) fs.cpSync(MEDIA_DIR, path.join(OUT, 'images'), { recursive: true });
+  if (fs.existsSync(MEDIA_DIR)) {
+    fs.cpSync(MEDIA_DIR, path.join(OUT, 'images'), { recursive: true, filter: (src) => !src.endsWith('-scroll.png') });
+  }
+  // brand kit (brand/index.html + logos), served next to the preview
+  fs.cpSync(path.join(THEME, 'brand'), path.join(OUT, 'brand'), { recursive: true, filter: (src) => !src.endsWith('.md') });
   fs.copyFileSync(path.join(THEME, 'tools/preview/shim.js'), path.join(OUT, 'preview-shim.js'));
   writeIndex(pages);
   writeNote();
@@ -200,6 +204,7 @@ function writeIndex(pages) {
     `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Maison preview — all pages</title>
 <style>body{font:15px/1.6 system-ui,sans-serif;background:#F7F3EC;color:#1F1D1A;margin:0;padding:32px 16px}main{max-width:880px;margin:auto}h1{font-weight:500}h2{margin-top:32px;font-weight:500;border-bottom:1px solid #0002;padding-bottom:6px}li{margin:4px 0}a{color:#1F1D1A}code{color:#876740;font-size:12px}</style></head>
 <body><main><h1>Maison Invitation — preview pages</h1><p>Rendered from the real Shopify theme files with sample data. Checkout, login and currency conversion run on Shopify once the store is live.</p>
+<h2>Brand kit</h2><ul><li><a href="brand/index.html">Logo system, colours &amp; typography</a> <code>/brand</code></li></ul>
 <h2>English</h2><ul>${list((groups.en || []).filter((p) => !p.url.includes('/pages/invitation/')))}</ul>
 <h2>Live invitation demos</h2><ul>${list((groups.en || []).filter((p) => p.url.includes('/pages/invitation/')))}</ul>
 <h2>العربية (Arabic storefront)</h2><ul dir="rtl">${list(groups.ar || [])}</ul></main></body></html>`,
