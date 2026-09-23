@@ -442,9 +442,16 @@ export function sampleCart(store) {
   const product = store.products.ivoire;
   const variant = product.variants[1];
   const addon = store.products['express-delivery'];
-  const props = ar
-    ? { 'الاسمان': 'آدم و ليلى', 'تاريخ الزفاف': '2027-04-15', 'المكان': 'فندق قصر الواحة، دبي', 'تأكيد الحضور': 'نموذج إلكتروني' }
-    : { Names: 'Adam & Leila', 'Wedding date': '2027-04-15', Venue: 'Al Waha Palace, Dubai', 'RSVP method': 'Online form' };
+  const props = {
+    'Name 1': 'آدم',
+    'Name 2': 'ليلى',
+    'Wedding date': '2027-04-15',
+    'Start time': '19:30',
+    Venue: ar ? 'فندق قصر الواحة' : 'Al Waha Palace',
+    City: ar ? 'دبي' : 'Dubai',
+    'RSVP method': 'Online form',
+    _source: 'wizard',
+  };
   const items = [
     {
       id: variant.id,

@@ -1,0 +1,22 @@
+{
+  "sections": {
+    "hero": { "type": "page-hero", "settings": { "preset": "faq", "show_mark": true } },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": { "type": "question", "settings": {} },
+        "q2": { "type": "question", "settings": {} },
+        "q3": { "type": "question", "settings": {} },
+        "q4": { "type": "question", "settings": {} },
+        "q5": { "type": "question", "settings": {} },
+        "q6": { "type": "question", "settings": {} },
+        "q7": { "type": "question", "settings": {} },
+        "q8": { "type": "question", "settings": {} }
+      },
+      "block_order": ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"],
+      "settings": { "layout": "stacked", "background": "default", "show_heading": false, "show_contact": true }
+    },
+    "cta": { "type": "cta-banner", "settings": { "background": "ink" } }
+  },
+  "order": ["hero", "faq", "cta"]
+}

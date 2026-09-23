@@ -1,0 +1,45 @@
+<section class="page-width">
+  <div class="account">
+    <div class="account__head">
+      <div>
+        <a class="link-arrow" href="{{ routes.account_url }}">{{ 'customer.account.return' | t }}</a>
+        <h1 class="h1" style="margin-block-start: 18px">{{ 'customer.addresses.title' | t }}</h1>
+      </div>
+    </div>
+    <div style="display:grid;gap:16px;align-content:start">
+      {%- for address in customer.addresses -%}
+        <div class="panel">
+          {%- if address == customer.default_address -%}<span class="eyebrow" style="margin:0">{{ 'customer.addresses.default' | t }}</span>{%- endif -%}
+          <p style="margin:0">{{ address | format_address }}</p>
+          {%- if address.id -%}
+            <form method="post" action="{{ routes.account_addresses_url }}/{{ address.id }}" style="margin:0">
+              <input type="hidden" name="_method" value="delete">
+              <button type="submit" class="link-arrow" onclick="return confirm('{{ 'customer.addresses.delete' | t }}?')">{{ 'customer.addresses.delete' | t }}</button>
+            </form>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+    <aside class="panel">
+      <h2 class="h4">{{ 'customer.addresses.add' | t }}</h2>
+      {%- form 'customer_address', customer.new_address, class: 'form-stack' -%}
+        <div class="field-row">
+          <div class="field"><label class="field__label" for="AddrFirst">{{ 'customer.addresses.first_name' | t }}</label><input id="AddrFirst" name="address[first_name]" autocomplete="given-name"></div>
+          <div class="field"><label class="field__label" for="AddrLast">{{ 'customer.addresses.last_name' | t }}</label><input id="AddrLast" name="address[last_name]" autocomplete="family-name"></div>
+        </div>
+        <div class="field"><label class="field__label" for="AddrLine1">{{ 'customer.addresses.address1' | t }}</label><input id="AddrLine1" name="address[address1]" autocomplete="address-line1"></div>
+        <div class="field-row">
+          <div class="field"><label class="field__label" for="AddrCity">{{ 'customer.addresses.city' | t }}</label><input id="AddrCity" name="address[city]" autocomplete="address-level2"></div>
+          <div class="field"><label class="field__label" for="AddrCountry">{{ 'customer.addresses.country' | t }}</label><select id="AddrCountry" name="address[country]">{{ all_country_option_tags }}</select></div>
+        </div>
+        <div class="field"><label class="field__label" for="AddrPhone">{{ 'customer.addresses.phone' | t }}</label><input id="AddrPhone" name="address[phone]" type="tel" autocomplete="tel" dir="ltr"></div>
+        <label class="checkbox"><input type="checkbox" name="address[default]" value="1"> {{ 'customer.addresses.set_default' | t }}</label>
+        <button type="submit" class="btn">{{ 'customer.addresses.save' | t }}</button>
+      {%- endform -%}
+    </aside>
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Addresses", "tag": "div", "settings": [] }
+{% endschema %}

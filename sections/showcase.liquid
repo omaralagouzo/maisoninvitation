@@ -29,10 +29,10 @@
     assign text = 'sections.showcase.text' | t
   endif
 
-  assign selected_id = section.blocks.first.id
+  assign selected_index = 1
   for block in section.blocks
     if block.settings.language_code == request.locale.iso_code
-      assign selected_id = block.id
+      assign selected_index = forloop.index
     endif
   endfor
 -%}
@@ -55,17 +55,18 @@
               {%- liquid
                 assign label = block.settings.label
                 if label == blank
-                  assign label = 'sections.showcase.tab_' | append: block.settings.language_code | t
+                  assign label_key = 'sections.showcase.tab_' | append: block.settings.language_code
+                  assign label = label_key | t
                 endif
               -%}
               <button
                 type="button"
                 class="tabs__tab"
                 role="tab"
-                id="Tab-{{ block.id }}"
-                aria-controls="Panel-{{ block.id }}"
-                aria-selected="{% if block.id == selected_id %}true{% else %}false{% endif %}"
-                tabindex="{% if block.id == selected_id %}0{% else %}-1{% endif %}"
+                id="Tab-{{ section.id }}-{{ forloop.index }}"
+                aria-controls="Panel-{{ section.id }}-{{ forloop.index }}"
+                aria-selected="{% if forloop.index == selected_index %}true{% else %}false{% endif %}"
+                tabindex="{% if forloop.index == selected_index %}0{% else %}-1{% endif %}"
                 lang="{{ block.settings.language_code }}"
                 {{ block.shopify_attributes }}
               >
@@ -81,10 +82,10 @@
       <div
         class="tab-panel"
         role="tabpanel"
-        id="Panel-{{ block.id }}"
-        aria-labelledby="Tab-{{ block.id }}"
+        id="Panel-{{ section.id }}-{{ forloop.index }}"
+        aria-labelledby="Tab-{{ section.id }}-{{ forloop.index }}"
         tabindex="0"
-        {% unless block.id == selected_id %}hidden{% endunless %}
+        {% unless forloop.index == selected_index %}hidden{% endunless %}
       >
         <div class="product-grid">
           {%- for product in coll.products limit: s.limit -%}

@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "main": { "type": "main-collection", "settings": { "per_page": 24 } },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": { "type": "question", "settings": {} },
+        "q2": { "type": "question", "settings": {} },
+        "q3": { "type": "question", "settings": {} },
+        "q4": { "type": "question", "settings": {} },
+        "q5": { "type": "question", "settings": {} }
+      },
+      "block_order": ["q1", "q2", "q3", "q4", "q5"],
+      "settings": { "layout": "split", "background": "alt", "show_contact": true }
+    }
+  },
+  "order": ["main", "faq"]
+}

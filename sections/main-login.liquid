@@ -1,0 +1,64 @@
+<section class="auth">
+  <div class="auth__card">
+    <div class="auth__head">
+      <span class="auth__mark">{% render 'brand-logo', variant: 'mark' %}</span>
+      <h1 class="h2">{{ 'customer.login.title' | t }}</h1>
+      <p class="muted">{{ 'customer.login.text' | t }}</p>
+    </div>
+
+    <div data-login-panel>
+      {%- form 'customer_login', class: 'form-stack', novalidate: 'novalidate' -%}
+        {%- if form.errors -%}<p class="form-error">{{ form.errors | default_errors }}</p>{%- endif -%}
+        <div class="field">
+          <label class="field__label" for="LoginEmail">{{ 'customer.login.email' | t }}</label>
+          <input id="LoginEmail" type="email" name="customer[email]" autocomplete="email" required dir="ltr">
+        </div>
+        <div class="field">
+          <label class="field__label" for="LoginPassword">{{ 'customer.login.password' | t }}</label>
+          <input id="LoginPassword" type="password" name="customer[password]" autocomplete="current-password" required>
+        </div>
+        <button type="submit" class="btn btn--block">{{ 'customer.login.submit' | t }}</button>
+      {%- endform -%}
+      <div class="auth__links" style="margin-block-start: 18px">
+        <a href="#recover" data-toggle-recover>{{ 'customer.login.forgot' | t }}</a>
+        <span>{{ 'customer.login.no_account' | t }} <a href="{{ routes.account_register_url }}">{{ 'customer.login.create' | t }}</a></span>
+      </div>
+    </div>
+
+    <div id="recover" data-recover-panel hidden>
+      <h2 class="h3" style="margin-block-end: 8px">{{ 'customer.login.recover_title' | t }}</h2>
+      <p class="muted">{{ 'customer.login.recover_text' | t }}</p>
+      {%- form 'recover_customer_password', class: 'form-stack' -%}
+        {%- if form.posted_successfully? -%}
+          <p class="form-success">{{ 'customer.login.recover_success' | t }}</p>
+        {%- endif -%}
+        <div class="field">
+          <label class="field__label" for="RecoverEmail">{{ 'customer.login.email' | t }}</label>
+          <input id="RecoverEmail" type="email" name="email" autocomplete="email" required dir="ltr">
+        </div>
+        <button type="submit" class="btn btn--block">{{ 'customer.login.recover_submit' | t }}</button>
+        <a href="#" data-toggle-recover class="auth__links">{{ 'customer.login.cancel' | t }}</a>
+      {%- endform -%}
+    </div>
+
+    {%- if shop.checkout.guest_login -%}
+      {%- form 'guest_login' -%}
+        <button type="submit" class="btn btn--outline btn--block">{{ 'customer.login.guest' | t }}</button>
+      {%- endform -%}
+    {%- endif -%}
+  </div>
+</section>
+<script>
+  (function () {
+    var login = document.querySelector('[data-login-panel]'), recover = document.querySelector('[data-recover-panel]');
+    var sync = function () { var r = location.hash === '#recover'; login.hidden = r; recover.hidden = !r; };
+    document.querySelectorAll('[data-toggle-recover]').forEach(function (a) {
+      a.addEventListener('click', function (e) { e.preventDefault(); location.hash = recover.hidden ? 'recover' : ''; sync(); });
+    });
+    sync();
+  })();
+</script>
+
+{% schema %}
+{ "name": "Log in", "tag": "div", "settings": [] }
+{% endschema %}

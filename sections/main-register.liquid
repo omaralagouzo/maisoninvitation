@@ -1,0 +1,35 @@
+<section class="auth">
+  <div class="auth__card">
+    <div class="auth__head">
+      <span class="auth__mark">{% render 'brand-logo', variant: 'mark' %}</span>
+      <h1 class="h2">{{ 'customer.register.title' | t }}</h1>
+    </div>
+    {%- form 'create_customer', class: 'form-stack' -%}
+      {%- if form.errors -%}<p class="form-error">{{ form.errors | default_errors }}</p>{%- endif -%}
+      <div class="field-row">
+        <div class="field">
+          <label class="field__label" for="RegFirst">{{ 'customer.register.first_name' | t }}</label>
+          <input id="RegFirst" type="text" name="customer[first_name]" autocomplete="given-name">
+        </div>
+        <div class="field">
+          <label class="field__label" for="RegLast">{{ 'customer.register.last_name' | t }}</label>
+          <input id="RegLast" type="text" name="customer[last_name]" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="RegEmail">{{ 'customer.register.email' | t }}</label>
+        <input id="RegEmail" type="email" name="customer[email]" autocomplete="email" required dir="ltr">
+      </div>
+      <div class="field">
+        <label class="field__label" for="RegPassword">{{ 'customer.register.password' | t }}</label>
+        <input id="RegPassword" type="password" name="customer[password]" autocomplete="new-password" required>
+      </div>
+      <button type="submit" class="btn btn--block">{{ 'customer.register.submit' | t }}</button>
+    {%- endform -%}
+    <p class="auth__links">{{ 'customer.register.have_account' | t }} <a href="{{ routes.account_login_url }}">{{ 'customer.login.submit' | t }}</a></p>
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Create account", "tag": "div", "settings": [] }
+{% endschema %}

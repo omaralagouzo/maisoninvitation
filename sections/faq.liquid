@@ -17,8 +17,10 @@
   <div class="page-width">
     <div class="faq{% if s.layout == 'stacked' %} faq--stacked{% endif %}">
       <div class="faq__intro">
-        <p class="eyebrow eyebrow--rule" data-reveal>{{ eyebrow }}</p>
-        <h2 class="h1" id="Faq-{{ section.id }}" data-reveal>{{ heading }}</h2>
+        {%- if s.show_heading -%}
+          <p class="eyebrow eyebrow--rule" data-reveal>{{ eyebrow }}</p>
+          <h2 class="h1" id="Faq-{{ section.id }}" data-reveal>{{ heading }}</h2>
+        {%- endif -%}
         {%- if s.show_contact -%}
           <a class="link-arrow" href="{{ root }}/pages/contact" data-reveal>{{ 'sections.faq.more' | t }} {% render 'icon', name: 'arrow', size: 16 %}</a>
         {%- endif -%}
@@ -29,11 +31,13 @@
             assign n = forloop.index
             assign q = block.settings.question
             if q == blank
-              assign q = 'sections.faq.q' | append: n | t
+              assign q_key = 'sections.faq.q' | append: n
+              assign q = q_key | t
             endif
             assign a = block.settings.answer
             if a == blank
-              assign a = 'sections.faq.a' | append: n | t
+              assign a_key = 'sections.faq.a' | append: n
+              assign a = a_key | t
             endif
           -%}
           <details class="accordion__item" {{ block.shopify_attributes }}>
@@ -62,11 +66,13 @@
           assign n = forloop.index
           assign q = block.settings.question
           if q == blank
-            assign q = 'sections.faq.q' | append: n | t
+            assign q_key = 'sections.faq.q' | append: n
+            assign q = q_key | t
           endif
           assign a = block.settings.answer
           if a == blank
-            assign a = 'sections.faq.a' | append: n | t
+            assign a_key = 'sections.faq.a' | append: n
+            assign a = a_key | t
           endif
         -%}
         {
@@ -107,6 +113,7 @@
       ],
       "default": "default"
     },
+    { "type": "checkbox", "id": "show_heading", "label": "Show heading", "default": true },
     { "type": "checkbox", "id": "show_contact", "label": "Show contact link", "default": true }
   ],
   "blocks": [

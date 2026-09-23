@@ -10,7 +10,7 @@
   const realFetch = window.fetch.bind(window);
   window.fetch = (input, init) => {
     const url = typeof input === 'string' ? input : input.url;
-    if (/\/cart(\/(add|change|update|clear))?(\.js)?(\?|$)/.test(url)) {
+    if (/cart[^?]*\.js(\?|$)/.test(url)) {
       return Promise.resolve(new Response(JSON.stringify({ items: [], item_count: 1 }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
     }
     return realFetch(input, init);
@@ -54,6 +54,13 @@
     },
     true,
   );
+
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('.shopify-payment-button')) {
+      event.preventDefault();
+      toast(t('Apple Pay, Shop Pay and other express checkouts appear here once the store is live.', 'تظهر هنا Apple Pay وShop Pay وطرق الدفع السريع عند إطلاق المتجر.'));
+    }
+  });
 
   // Floating preview badge with quick links.
   const style = document.createElement('style');

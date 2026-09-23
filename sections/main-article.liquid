@@ -1,0 +1,15 @@
+<article class="section" style="padding-block-start: clamp(48px, 7vw, 100px)">
+  <div class="page-width page-width--narrow">
+    <a class="link-arrow" href="{{ blog.url }}" style="margin-block-end: 28px">{{ 'blogs.back' | t }}</a>
+    <p class="eyebrow">{{ article.published_at | date: '%B %-d, %Y' }}</p>
+    <h1 class="h1" style="margin-block-end: 32px">{{ article.title }}</h1>
+    {%- if article.image -%}
+      <div style="margin-block-end: 40px; border-radius: var(--radius-sm); overflow: hidden">{{ article.image | image_url: width: 1600 | image_tag: loading: 'eager', alt: article.title }}</div>
+    {%- endif -%}
+    <div class="rte lede" style="max-inline-size: none">{{ article.content }}</div>
+  </div>
+</article>
+
+{% schema %}
+{ "name": "Article", "tag": "div", "settings": [] }
+{% endschema %}

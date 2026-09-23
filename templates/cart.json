@@ -1,0 +1,7 @@
+{
+  "sections": {
+    "main": { "type": "main-cart", "settings": {} },
+    "related": { "type": "related-products", "settings": { "limit": 4 } }
+  },
+  "order": ["main", "related"]
+}

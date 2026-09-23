@@ -1,0 +1,44 @@
+{%- liquid
+  assign s = section.settings
+  assign coll = s.collection
+  if coll == blank
+    assign coll = collections['invitations']
+  endif
+  if coll == blank
+    assign coll = collections['all']
+  endif
+  assign heading = s.heading
+  if heading == blank
+    assign heading = 'products.product.more_designs' | t
+  endif
+  assign shown = 0
+-%}
+<section class="section section--alt" aria-labelledby="Related-{{ section.id }}">
+  <div class="page-width">
+    <div class="section-intro section-intro--split">
+      <h2 class="h1" id="Related-{{ section.id }}" data-reveal>{{ heading }}</h2>
+      <a class="link-arrow" href="{{ coll.url }}" data-reveal>{{ 'header.mega.view_all' | t }} {% render 'icon', name: 'arrow', size: 16 %}</a>
+    </div>
+    <div class="product-grid">
+      {%- for item in coll.products -%}
+        {%- if item.id == product.id -%}{%- continue -%}{%- endif -%}
+        {%- if shown >= s.limit -%}{%- break -%}{%- endif -%}
+        {% render 'product-card', product: item, lang: request.locale.iso_code, index: shown %}
+        {%- assign shown = shown | plus: 1 -%}
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "More designs",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "collection", "id": "collection", "label": "Collection", "info": "Defaults to “invitations”." },
+    { "type": "range", "id": "limit", "min": 2, "max": 8, "step": 1, "label": "Designs to show", "default": 4 }
+  ],
+  "presets": [{ "name": "More designs" }]
+}
+{% endschema %}

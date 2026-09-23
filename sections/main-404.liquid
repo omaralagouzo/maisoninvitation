@@ -1,0 +1,17 @@
+{%- liquid
+  assign coll = collections['invitations']
+  if coll == blank
+    assign coll = collections['all']
+  endif
+-%}
+<section class="page-width not-found">
+  <span class="not-found__envelope">{% render 'brand-logo', variant: 'mark' %}</span>
+  <p class="eyebrow">{{ 'general.not_found.eyebrow' | t }}</p>
+  <h1 class="h1">{{ 'general.not_found.heading' | t }}</h1>
+  <p class="lede">{{ 'general.not_found.text' | t }}</p>
+  <a class="btn" href="{{ coll.url }}">{{ 'general.not_found.button' | t }} {% render 'icon', name: 'arrow', size: 18 %}</a>
+</section>
+
+{% schema %}
+{ "name": "404", "tag": "div", "settings": [] }
+{% endschema %}

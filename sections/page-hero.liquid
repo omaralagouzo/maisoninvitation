@@ -1,0 +1,61 @@
+{%- liquid
+  assign s = section.settings
+  assign key = s.preset
+  assign eyebrow = s.eyebrow
+  assign heading = s.heading
+  assign text = s.text
+  if key != 'custom'
+    assign base_key = 'sections.page_hero.' | append: key
+    if eyebrow == blank
+      assign eyebrow_key = base_key | append: '_eyebrow'
+      assign eyebrow = eyebrow_key | t
+    endif
+    if heading == blank
+      assign heading_key = base_key | append: '_heading'
+      assign heading = heading_key | t
+    endif
+    if text == blank
+      assign text_key = base_key | append: '_text'
+      assign text = text_key | t
+    endif
+  endif
+  if heading == blank
+    assign heading = page.title
+  endif
+-%}
+<section class="page-hero">
+  <div class="page-width page-width--narrow page-hero__inner">
+    {%- if s.show_mark -%}<span class="page-hero__mark" data-reveal>{% render 'brand-logo', variant: 'mark' %}</span>{%- endif -%}
+    {%- if eyebrow != blank -%}<p class="eyebrow" data-reveal>{{ eyebrow }}</p>{%- endif -%}
+    <h1 class="h1" data-reveal>{{ heading }}</h1>
+    {%- if text != blank -%}<p class="lede" data-reveal>{{ text }}</p>{%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Page heading",
+  "tag": "div",
+  "settings": [
+    {
+      "type": "select",
+      "id": "preset",
+      "label": "Default wording",
+      "options": [
+        { "value": "how", "label": "How it works" },
+        { "value": "faq", "label": "Questions" },
+        { "value": "about", "label": "About" },
+        { "value": "contact", "label": "Contact" },
+        { "value": "custom", "label": "None (use the fields below / page title)" }
+      ],
+      "default": "custom",
+      "info": "Translated automatically. Fill the fields below to override."
+    },
+    { "type": "text", "id": "eyebrow", "label": "Small label" },
+    { "type": "text", "id": "heading", "label": "Heading" },
+    { "type": "textarea", "id": "text", "label": "Text" },
+    { "type": "checkbox", "id": "show_mark", "label": "Show envelope mark", "default": true }
+  ],
+  "presets": [{ "name": "Page heading" }]
+}
+{% endschema %}

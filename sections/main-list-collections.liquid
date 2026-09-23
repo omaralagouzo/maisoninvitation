@@ -1,0 +1,22 @@
+<section class="section">
+  <div class="page-width">
+    <div class="section-intro"><h1 class="h1">{{ page_title }}</h1></div>
+    <div class="product-grid">
+      {%- for collection in collections -%}
+        {%- if collection.handle == 'add-ons' -%}{%- continue -%}{%- endif -%}
+        <article class="card">
+          <a class="card__media" href="{{ collection.url }}">
+            {%- assign img = collection.image | default: collection.featured_image -%}
+            {%- if img -%}{{ img | image_url: width: 700 | image_tag: loading: 'lazy', alt: collection.title }}{%- endif -%}
+          </a>
+          <h2 class="card__title"><a href="{{ collection.url }}">{{ collection.title }}</a></h2>
+          <p class="card__meta">{{ 'collections.count' | t: count: collection.products_count }}</p>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Collections list", "tag": "div", "settings": [] }
+{% endschema %}

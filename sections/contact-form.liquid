@@ -1,0 +1,76 @@
+{%- liquid
+  assign contact_email = settings.contact_email | default: shop.email
+-%}
+<section class="section" style="padding-block-start: 0">
+  <div class="page-width page-width--medium">
+    <div class="contact">
+      <aside class="contact__aside">
+        {%- if contact_email != blank -%}
+          <div class="contact__card" data-reveal>
+            <span class="eyebrow" style="margin:0">{{ 'contact.email' | t }}</span>
+            <a href="mailto:{{ contact_email }}">{{ contact_email }}</a>
+          </div>
+        {%- endif -%}
+        {%- if settings.whatsapp_number != blank -%}
+          <div class="contact__card" data-reveal>
+            <span class="eyebrow" style="margin:0">{{ 'general.social.whatsapp' | t }}</span>
+            <a href="https://wa.me/{{ settings.whatsapp_number | remove: '+' | remove: ' ' }}" target="_blank" rel="noopener">{{ 'contact.whatsapp' | t }} →</a>
+          </div>
+        {%- endif -%}
+        {%- if settings.social_instagram_link != blank -%}
+          <div class="contact__card" data-reveal>
+            <span class="eyebrow" style="margin:0">{{ 'general.social.instagram' | t }}</span>
+            <a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener">{{ settings.social_instagram_link | remove: 'https://' | remove: 'www.' }}</a>
+          </div>
+        {%- endif -%}
+      </aside>
+
+      <div class="contact-form-card" data-reveal>
+        <h2 class="h3" style="margin-block-end: 24px">{{ 'contact.heading' | t }}</h2>
+        {%- form 'contact', id: 'ContactForm', class: 'form-stack' -%}
+          {%- if form.posted_successfully? -%}
+            <p class="form-success" role="status">{% render 'icon', name: 'check', size: 20 %} {{ 'contact.success' | t }}</p>
+          {%- else -%}
+            {%- if form.errors -%}<p class="form-error">{{ form.errors | default_errors }}</p>{%- endif -%}
+            <div class="field-row">
+              <div class="field">
+                <label class="field__label" for="ContactName">{{ 'contact.name' | t }}</label>
+                <input id="ContactName" type="text" name="contact[name]" autocomplete="name" required>
+              </div>
+              <div class="field">
+                <label class="field__label" for="ContactEmail">{{ 'contact.email' | t }}</label>
+                <input id="ContactEmail" type="email" name="contact[email]" autocomplete="email" required dir="ltr">
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label class="field__label" for="ContactPhone">{{ 'contact.phone' | t }} <small>{{ 'products.product.optional' | t }}</small></label>
+                <input id="ContactPhone" type="tel" name="contact[phone]" autocomplete="tel" dir="ltr">
+              </div>
+              <div class="field">
+                <label class="field__label" for="ContactDate">{{ 'contact.date' | t }} <small>{{ 'products.product.optional' | t }}</small></label>
+                <input id="ContactDate" type="date" name="contact[Wedding date]">
+              </div>
+            </div>
+            <div class="field">
+              <label class="field__label" for="ContactMessage">{{ 'contact.message' | t }}</label>
+              <textarea id="ContactMessage" name="contact[body]" rows="6" required></textarea>
+            </div>
+            <div><button type="submit" class="btn">{{ 'contact.send' | t }} {% render 'icon', name: 'arrow', size: 18 %}</button></div>
+          {%- endif -%}
+        {%- endform -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Contact form",
+  "tag": "div",
+  "settings": [
+    { "type": "paragraph", "content": "Messages are emailed to your store's sender email (Settings → Notifications). Email, WhatsApp and Instagram come from Theme settings → Social & contact." }
+  ],
+  "presets": [{ "name": "Contact form" }]
+}
+{% endschema %}

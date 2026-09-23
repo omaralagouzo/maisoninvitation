@@ -1,6 +1,7 @@
 {%- comment -%} Formats an amount (in cents) honouring the "Show currency codes" setting. {%- endcomment -%}
+{%- comment -%} Wrapped in U+2066/U+2069 (left-to-right isolate) so prices keep their order inside Arabic text. {%- endcomment -%}
 {%- if settings.currency_code_enabled -%}
-  {{- amount | money_with_currency -}}
+  ⁦{{- amount | money_with_currency -}}⁩
 {%- else -%}
-  {{- amount | money -}}
+  ⁦{{- amount | money -}}⁩
 {%- endif -%}

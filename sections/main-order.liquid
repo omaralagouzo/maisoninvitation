@@ -1,0 +1,42 @@
+<section class="page-width">
+  <div class="account">
+    <div class="account__head">
+      <div>
+        <a class="link-arrow" href="{{ routes.account_url }}">{{ 'customer.account.return' | t }}</a>
+        <h1 class="h1" style="margin-block-start: 18px">{{ 'customer.order.title' | t: name: order.name }}</h1>
+        {%- assign placed = order.created_at | date: '%d %B %Y' -%}
+        <p class="muted">{{ 'customer.order.placed' | t: date: placed }}</p>
+      </div>
+    </div>
+    <div>
+      <table class="table">
+        <thead><tr><th>{{ 'customer.order.product' | t }}</th><th>{{ 'customer.order.quantity' | t }}</th><th>{{ 'customer.order.total' | t }}</th></tr></thead>
+        <tbody>
+          {%- for item in order.line_items -%}
+            <tr>
+              <td data-label="{{ 'customer.order.product' | t }}">
+                <strong>{{ item.title }}</strong>
+                {%- for p in item.properties -%}
+                  {%- assign first_char = p.first | slice: 0 -%}
+                  {%- unless p.last == blank or first_char == '_' -%}<br><span class="muted" dir="auto">{{ p.first }}: {{ p.last }}</span>{%- endunless -%}
+                {%- endfor -%}
+              </td>
+              <td data-label="{{ 'customer.order.quantity' | t }}">{{ item.quantity }}</td>
+              <td data-label="{{ 'customer.order.total' | t }}">{% render 'money', amount: item.final_line_price %}</td>
+            </tr>
+          {%- endfor -%}
+        </tbody>
+      </table>
+      <div class="summary__total"><span>{{ 'customer.order.total' | t }}</span><strong>{% render 'money', amount: order.total_price %}</strong></div>
+    </div>
+    <aside class="panel">
+      <h2 class="h4">{{ 'customer.order.billing' | t }}</h2>
+      <p class="muted" style="margin:0">{{ order.billing_address | format_address }}</p>
+      <p style="margin:0"><strong>{{ order.financial_status_label }}</strong> · {{ order.fulfillment_status_label }}</p>
+    </aside>
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Order", "tag": "div", "settings": [] }
+{% endschema %}

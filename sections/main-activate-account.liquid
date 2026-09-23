@@ -1,0 +1,20 @@
+<section class="auth">
+  <div class="auth__card">
+    <div class="auth__head">
+      <span class="auth__mark">{% render 'brand-logo', variant: 'mark' %}</span>
+      <h1 class="h2">{{ 'customer.activate.title' | t }}</h1>
+      <p class="muted">{{ 'customer.activate.text' | t }}</p>
+    </div>
+    {%- form 'activate_customer_password', class: 'form-stack' -%}
+      {%- if form.errors -%}<p class="form-error">{{ form.errors | default_errors }}</p>{%- endif -%}
+      <div class="field"><label class="field__label" for="ActPass">{{ 'customer.activate.password' | t }}</label><input id="ActPass" type="password" name="customer[password]" autocomplete="new-password" required></div>
+      <div class="field"><label class="field__label" for="ActConfirm">{{ 'customer.activate.confirm' | t }}</label><input id="ActConfirm" type="password" name="customer[password_confirmation]" autocomplete="new-password" required></div>
+      <button type="submit" class="btn btn--block">{{ 'customer.activate.submit' | t }}</button>
+      <button type="submit" name="decline" class="btn btn--outline btn--block">{{ 'customer.activate.decline' | t }}</button>
+    {%- endform -%}
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Activate account", "tag": "div", "settings": [] }
+{% endschema %}

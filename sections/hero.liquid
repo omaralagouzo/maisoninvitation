@@ -33,9 +33,18 @@
   if secondary_link == blank
     assign secondary_link = root | append: '/pages/how-it-works'
   endif
+  assign demo_lang = 'en'
+  assign demo_image = s.demo_image
+  if request.locale.iso_code == 'ar'
+    assign demo_lang = 'ar'
+    if s.demo_image_ar != blank
+      assign demo_image = s.demo_image_ar
+    endif
+  endif
+  assign demo_asset = 'demo-scroll-ivoire-' | append: demo_lang | append: '.jpg'
   assign demo_url = s.demo_url
   if demo_url == blank
-    assign demo_url = root | append: '/pages/invitation/ivoire-en'
+    assign demo_url = root | append: '/pages/invitation/ivoire-' | append: demo_lang
   endif
 -%}
 
@@ -69,8 +78,8 @@
       <figure class="hero__phone" data-reveal style="--reveal-delay: .2s">
         {% render 'phone-frame',
           mode: s.demo_mode,
-          image: s.demo_image,
-          asset: 'demo-scroll-ivoire-en.jpg',
+          image: demo_image,
+          asset: demo_asset,
           url: demo_url,
           alt: s.demo_label,
           duration: s.scroll_duration,
@@ -102,7 +111,7 @@
       "content": "Leave any text blank to use the default wording — it's translated into Arabic automatically."
     },
     { "type": "text", "id": "eyebrow", "label": "Small label", "placeholder": "Digital wedding invitations" },
-    { "type": "inline_richtext", "id": "heading", "label": "Headline", "placeholder": "It starts <em>here</em>", "info": "Italicise a word to set it in brass." },
+    { "type": "inline_richtext", "id": "heading", "label": "Headline", "info": "Default: It starts here. Italicise a word to set it in brass." },
     { "type": "textarea", "id": "text", "label": "Text" },
     { "type": "text", "id": "button_label", "label": "Button label", "placeholder": "Start designing" },
     { "type": "url", "id": "button_link", "label": "Button link", "info": "Defaults to the invitations collection." },
@@ -129,6 +138,12 @@
       "id": "demo_image",
       "label": "Screenshot",
       "info": "A full-length mobile screenshot (e.g. 780px wide). Defaults to the Ivoire demo."
+    },
+    {
+      "type": "image_picker",
+      "id": "demo_image_ar",
+      "label": "Screenshot for the Arabic storefront",
+      "info": "Optional. Defaults to the Arabic Ivoire demo."
     },
     {
       "type": "url",

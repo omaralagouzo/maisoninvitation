@@ -21,11 +21,13 @@
           assign key = block.settings.feature
           assign title = block.settings.title
           if title == blank
-            assign title = 'sections.features.' | append: key | append: '_title' | t
+            assign title_key = 'sections.features.' | append: key | append: '_title'
+            assign title = title_key | t
           endif
           assign body = block.settings.text
           if body == blank
-            assign body = 'sections.features.' | append: key | append: '_text' | t
+            assign body_key = 'sections.features.' | append: key | append: '_text'
+            assign body = body_key | t
           endif
           case key
             when 'envelope'

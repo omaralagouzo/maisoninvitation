@@ -71,7 +71,7 @@ def write_snippets(manifest):
         if snippet == "fonts":
             for _, name, *_ in faces:
                 if name in PRELOAD:
-                    lines.append(f'<link rel="preload" href="{{{{ \'{name}\' | asset_url }}}}" as="font" type="font/woff2" crossorigin>')
+                    lines.append(f"{{{{ '{name}' | asset_url | preload_tag: as: 'font', type: 'font/woff2', crossorigin: true }}}}")
         lines.append("{% style %}")
         for fam, name, style, weight, urange, _ in faces:
             lines.append(

@@ -8,7 +8,7 @@
     "preview": "node tools/preview/build.mjs && npx serve dist/preview -l 4173",
     "preview:build": "node tools/preview/build.mjs",
     "images": "node tools/images/generate.mjs",
-    "check": "theme-check .",
+    "check": "node tools/check/theme-check.mjs",
     "setup:store": "node tools/shopify-setup/setup.mjs"
   },
   "devDependencies": {

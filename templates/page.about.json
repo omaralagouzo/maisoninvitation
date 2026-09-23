@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "hero": { "type": "page-hero", "settings": { "preset": "about", "show_mark": true } },
+    "story": { "type": "about-story", "settings": {} },
+    "bilingual": { "type": "bilingual", "settings": { "demo_design": "minuit" } },
+    "cta": { "type": "cta-banner", "settings": { "background": "alt" } }
+  },
+  "order": ["hero", "story", "bilingual", "cta"]
+}

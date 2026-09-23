@@ -1,0 +1,37 @@
+<section class="section" style="padding-block-start: clamp(48px, 7vw, 100px)">
+  <div class="page-width">
+    <div class="section-intro section-intro--center">
+      <p class="eyebrow">{{ 'search.title' | t }}</p>
+      {%- if search.performed -%}
+        <h1 class="h2">{{ 'search.results_for' | t: terms: search.terms }}</h1>
+      {%- else -%}
+        <h1 class="h2">{{ 'search.title' | t }}</h1>
+      {%- endif -%}
+    </div>
+    <form action="{{ routes.search_url }}" method="get" role="search" class="search-form" style="margin-block-end: 56px">
+      <label class="visually-hidden" for="SearchInput">{{ 'search.placeholder' | t }}</label>
+      <input id="SearchInput" class="input" type="search" name="q" value="{{ search.terms | escape }}" placeholder="{{ 'search.placeholder' | t }}">
+      <input type="hidden" name="type" value="product">
+      <button type="submit" class="btn">{% render 'icon', name: 'search', size: 18 %}<span class="visually-hidden">{{ 'search.submit' | t }}</span></button>
+    </form>
+    {%- if search.performed -%}
+      {%- if search.results_count == 0 -%}
+        <p class="lede" style="text-align:center;margin-inline:auto">{{ 'search.no_results' | t: terms: search.terms }}</p>
+      {%- else -%}
+        <div class="product-grid">
+          {%- for item in search.results -%}
+            {%- if item.object_type == 'product' or item.variants -%}
+              {% render 'product-card', product: item, lang: request.locale.iso_code, index: forloop.index0 %}
+            {%- else -%}
+              <article class="card"><h3 class="card__title"><a href="{{ item.url }}">{{ item.title }}</a></h3><p class="card__meta">{{ item.content | strip_html | truncatewords: 24 }}</p></article>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{ "name": "Search", "tag": "div", "settings": [] }
+{% endschema %}

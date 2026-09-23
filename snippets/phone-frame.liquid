@@ -20,8 +20,10 @@
   endif
   if image
     assign src = image | image_url: width: 900
+    assign img_h = 900 | divided_by: image.aspect_ratio | round
   else
     assign src = asset | asset_url
+    assign img_h = 7200
   endif
 -%}
 <div
@@ -44,7 +46,7 @@
         </div>
       {%- else -%}
         <div class="phone__scroll">
-          <img src="{{ src }}" alt="{{ alt | escape }}" loading="{{ loading }}" decoding="async" width="780">
+          <img src="{{ src }}" alt="{{ alt | escape }}" loading="{{ loading }}" decoding="async" width="{% if image %}900{% else %}780{% endif %}" height="{{ img_h }}">
         </div>
     {%- endcase -%}
     <span class="phone__glare" aria-hidden="true"></span>

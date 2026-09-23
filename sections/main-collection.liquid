@@ -1,0 +1,149 @@
+{%- comment -%}
+  Collection page. Filters come from Shopify's native storefront filtering
+  (install the free "Search & Discovery" app → add filters e.g. Language, Style, Price).
+  The filter form is plain GET, so it works without JavaScript; JS only auto-submits.
+{%- endcomment -%}
+{%- liquid
+  assign s = section.settings
+  assign lang = 'en'
+  if request.locale.iso_code == 'ar'
+    assign lang = 'ar'
+  endif
+-%}
+<section class="collection-hero">
+  <div class="page-width collection-hero__inner">
+    <div>
+      <p class="eyebrow eyebrow--rule">{{ 'header.mega.eyebrow' | t }}</p>
+      <h1 class="h1">{{ collection.title }}</h1>
+      {%- if collection.description != blank -%}
+        <div class="lede rte">{{ collection.description }}</div>
+      {%- endif -%}
+    </div>
+    <p class="muted">{{ 'collections.count' | t: count: collection.products_count }}</p>
+  </div>
+</section>
+
+<div class="page-width" style="padding-block-end: var(--section-space)">
+  {%- paginate collection.products by s.per_page -%}
+    <form class="toolbar" method="get" action="{{ collection.url }}" data-auto-submit>
+      <div class="toolbar__filters">
+        {%- if collection.filters.size > 0 -%}
+          <span class="toolbar__label">{{ 'collections.filter' | t }}</span>
+          {%- for filter in collection.filters -%}
+            {%- case filter.type -%}
+              {%- when 'list', 'boolean' -%}
+                {%- for value in filter.values -%}
+                  <label class="filter-pill">
+                    <input type="checkbox" name="{{ value.param_name }}" value="{{ value.value }}" {% if value.active %}checked{% endif %} {% if value.count == 0 and value.active == false %}disabled{% endif %}>
+                    {{ value.label }} <span class="filter-pill__count">{{ value.count }}</span>
+                  </label>
+                {%- endfor -%}
+              {%- when 'price_range' -%}
+                <label class="filter-pill">
+                  {{ 'collections.price_from' | t }}
+                  <input style="position:static;opacity:1;pointer-events:auto;width:60px;border:0;background:transparent" type="number" name="{{ filter.min_value.param_name }}" value="{{ filter.min_value.value | money_without_currency | remove: ',' }}" placeholder="0" min="0">
+                </label>
+                <label class="filter-pill">
+                  {{ 'collections.price_to' | t }}
+                  <input style="position:static;opacity:1;pointer-events:auto;width:60px;border:0;background:transparent" type="number" name="{{ filter.max_value.param_name }}" value="{{ filter.max_value.value | money_without_currency | remove: ',' }}" placeholder="{{ filter.range_max | money_without_currency | remove: ',' }}" min="0">
+                </label>
+            {%- endcase -%}
+          {%- endfor -%}
+          {%- assign active_count = 0 -%}
+          {%- for filter in collection.filters -%}{%- assign active_count = active_count | plus: filter.active_values.size -%}{%- endfor -%}
+          {%- if active_count > 0 -%}
+            <a class="link-arrow" href="{{ collection.url }}?sort_by={{ collection.sort_by }}">{{ 'collections.clear' | t }}</a>
+          {%- endif -%}
+        {%- else -%}
+          {%- comment -%} No storefront filters configured yet: instant client-side filter by style. {%- endcomment -%}
+          <button type="button" class="filter-pill is-active" data-style-filter="">{{ 'collections.all' | t }}</button>
+          {%- for type in collection.all_types -%}
+            {%- if type != blank and type != 'Add-on' -%}
+              {%- liquid
+                assign label = type
+                for p in collection.products
+                  if p.type == type and p.metafields.maison.style != blank
+                    assign label = p.metafields.maison.style.value
+                    break
+                  endif
+                endfor
+              -%}
+              <button type="button" class="filter-pill" data-style-filter="{{ type | escape }}">{{ label }}</button>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+      <div class="toolbar__sort">
+        <label class="toolbar__label" for="SortBy">{{ 'collections.sort' | t }}</label>
+        <select id="SortBy" class="select" name="sort_by">
+          {%- for option in collection.sort_options -%}
+            <option value="{{ option.value }}" {% if option.value == collection.sort_by %}selected{% endif %}>{{ option.name }}</option>
+          {%- endfor -%}
+        </select>
+        <noscript><button type="submit" class="btn btn--small">{{ 'collections.apply' | t }}</button></noscript>
+      </div>
+    </form>
+
+    {%- if collection.products.size > 0 -%}
+      <div class="product-grid">
+        {%- for product in collection.products -%}
+          {%- liquid
+            assign match = nil
+            assign sku_tail = '-' | append: lang | upcase
+            for v in product.variants
+              assign tail = v.sku | upcase | slice: -3, 3
+              if tail == sku_tail
+                assign match = v
+                break
+              endif
+            endfor
+          -%}
+          {%- liquid
+            assign eager = false
+            if forloop.index0 < 4
+              assign eager = true
+            endif
+          -%}
+          <div data-style="{{ product.type | escape }}" style="display:contents">
+            {% render 'product-card', product: product, variant: match, lang: lang, index: forloop.index0, eager: eager %}
+          </div>
+        {%- endfor -%}
+      </div>
+    {%- else -%}
+      <div class="empty-state">
+        <span class="empty-state__mark">{% render 'brand-logo', variant: 'mark' %}</span>
+        <p class="h3">{{ 'collections.empty' | t }}</p>
+      </div>
+    {%- endif -%}
+
+    {%- if paginate.pages > 1 -%}
+      {% render 'pagination', paginate: paginate %}
+    {%- endif -%}
+  {%- endpaginate -%}
+</div>
+
+<script>
+  document.querySelectorAll('[data-style-filter]').forEach((pill, _, all) =>
+    pill.addEventListener('click', () => {
+      all.forEach((p) => p.classList.toggle('is-active', p === pill));
+      document.querySelectorAll('[data-style]').forEach((card) => {
+        card.hidden = pill.dataset.styleFilter !== '' && card.dataset.style !== pill.dataset.styleFilter;
+      });
+    })
+  );
+  document.querySelectorAll('[data-auto-submit]').forEach((form) =>
+    form.addEventListener('change', (e) => {
+      if (e.target.matches('select, input[type="checkbox"]')) form.submit();
+    })
+  );
+</script>
+
+{% schema %}
+{
+  "name": "Collection",
+  "tag": "section",
+  "settings": [
+    { "type": "range", "id": "per_page", "min": 8, "max": 48, "step": 4, "label": "Designs per page", "default": 24 }
+  ]
+}
+{% endschema %}

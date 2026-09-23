@@ -77,9 +77,10 @@ function imageSrc(input) {
   if (!input) return '';
   if (input instanceof ImageUrl) return input.src;
   if (typeof input === 'string') return input;
-  if (input.preview_image) return imageSrc(input.preview_image);
-  if (input.featured_image) return imageSrc(input.featured_image);
-  return input.src || input.url || '';
+  if (input.src || input.url) return input.src || input.url;
+  if (input.preview_image && input.preview_image !== input) return imageSrc(input.preview_image);
+  if (input.featured_image && input.featured_image !== input) return imageSrc(input.featured_image);
+  return '';
 }
 
 // ------------------------------------------------------------------ engine
@@ -166,7 +167,7 @@ function registerFilters(engine, ctx) {
   f('script_tag', (url) => `<script src="${url}" type="text/javascript"></script>`);
   f('preload_tag', (url, ...args) => {
     const { kw } = kwargs(args);
-    return `<link href="${url}" rel="preload" as="${kw.as || 'style'}">`;
+    return `<link href="${url}" rel="preload" as="${kw.as || 'style'}"${kw.type ? ` type="${kw.type}"` : ''}${kw.crossorigin ? ' crossorigin' : ''}>`;
   });
 
   f('image_url', (input, ...args) => {
@@ -230,6 +231,9 @@ function registerFilters(engine, ctx) {
     return `<time datetime="${new Date(d).toISOString()}">${engine.parseAndRenderSync(`{{ d | date: f }}`, { d: out, f: fmt })}</time>`;
   });
   f('structured_data', () => '');
+  f('payment_button', () =>
+    `<div class="shopify-payment-button"><button type="button" class="shopify-payment-button__button btn btn--block btn--outline" data-preview-buy-now>Buy it now</button><button type="button" class="shopify-payment-button__more-options" style="display:block;margin:10px auto 0;text-decoration:underline">More payment options</button></div>`,
+  );
   f('sum', (arr, prop) => (arr || []).reduce((acc, x) => acc + Number(prop ? x?.[prop] : x) || 0, 0));
   f('color_to_rgb', (hex) => {
     const h = String(hex).replace('#', '');

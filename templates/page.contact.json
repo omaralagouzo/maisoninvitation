@@ -1,0 +1,7 @@
+{
+  "sections": {
+    "hero": { "type": "page-hero", "settings": { "preset": "contact", "show_mark": true } },
+    "form": { "type": "contact-form", "settings": {} }
+  },
+  "order": ["hero", "form"]
+}

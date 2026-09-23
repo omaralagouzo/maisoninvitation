@@ -59,8 +59,9 @@
     {%- if hover -%}
       {{ hover | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 1100px) 25vw, (min-width: 750px) 33vw, 50vw', widths: '360, 540, 720, 900', alt: '', class: 'card__img--hover' }}
     {%- endif -%}
-    {%- if product.type != blank -%}
-      <span class="card__badge">{{ product.type }}</span>
+    {%- assign badge = product.metafields.maison.style.value | default: product.type -%}
+    {%- if badge != blank -%}
+      <span class="card__badge">{{ badge }}</span>
     {%- endif -%}
   </a>
   <div class="card__body">

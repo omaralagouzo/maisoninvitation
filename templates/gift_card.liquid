@@ -1,0 +1,46 @@
+{% layout none %}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}" dir="{% if request.locale.iso_code == 'ar' %}rtl{% else %}ltr{% endif %}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>{{ 'gift_cards.title' | t }} — {{ shop.name }}</title>
+    {% render 'favicon' %}
+    {% render 'fonts' %}
+    {% render 'theme-vars' %}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+    {{ content_for_header }}
+  </head>
+  <body>
+    <main class="auth">
+      <div class="auth__card" style="text-align:center">
+        <span class="auth__mark" style="margin-inline:auto">{% render 'brand-logo', variant: 'mark' %}</span>
+        <h1 class="h2">{{ 'gift_cards.title' | t }}</h1>
+        <p class="display" style="font-size:3.4rem">{{ gift_card.balance | money }}</p>
+        {%- if gift_card.expired -%}
+          <p class="muted">{{ 'gift_cards.expired' | t: date: gift_card.expires_on }}</p>
+        {%- endif -%}
+        <div class="field">
+          <label class="field__label" for="GiftCardCode" style="justify-content:center">{{ 'gift_cards.code' | t }}</label>
+          <input id="GiftCardCode" class="input" type="text" value="{{ gift_card.code | format_code }}" readonly style="text-align:center;letter-spacing:.1em">
+        </div>
+        <div id="QrCode" data-identifier="{{ gift_card.qr_identifier }}" style="display:grid;place-items:center"></div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a class="btn" href="{{ shop.url }}" target="_blank" rel="noopener">{{ 'gift_cards.shop' | t }}</a>
+          <button class="btn btn--outline" type="button" onclick="window.print()">{{ 'gift_cards.print' | t }}</button>
+        </div>
+        {%- if gift_card.pass_url -%}
+          <a href="{{ gift_card.pass_url }}"><img src="{{ 'gift-card/add-to-apple-wallet.svg' | shopify_asset_url }}" width="120" height="40" alt="Add to Apple Wallet" style="margin-inline:auto"></a>
+        {%- endif -%}
+      </div>
+    </main>
+    <script>
+      window.addEventListener('load', function () {
+        var el = document.getElementById('QrCode');
+        if (window.QRCode && el) new QRCode(el, { text: el.dataset.identifier, width: 120, height: 120 });
+      });
+    </script>
+  </body>
+</html>
