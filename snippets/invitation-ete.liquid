@@ -11,8 +11,12 @@
   Params: m, s (section settings), lang, dir, k (translation prefix), p1, p2, names, amp,
   i1, i2, ds (event date), iso, rsvp_mode, max_guests, show_envelope, alt, is_demo
 {%- endcomment -%}
+{%- comment -%}
+  Day-count wording: Arabic uses 1 → يوم, 2 → يومان, 3–10 → أيام, 11–99 → يومًا, 100+ → يوم
+  (invitation-ete.js picks the same forms with Intl.PluralRules as the count updates).
+{%- endcomment -%}
 {%- liquid
-  assign intro = m.intro_line.value | default: ''
+  assign intro = m.intro_line.value | escape | newline_to_br
   if intro == blank
     assign intro = k | append: 'getting_married' | t
   endif
@@ -32,6 +36,20 @@
     assign days_left = 0
   endif
 
+  assign days_key = 'days_to_go'
+  assign days_mod = days_left | modulo: 100
+  if days_left == 1
+    assign days_key = 'day_to_go'
+  elsif lang == 'ar'
+    if days_left == 2
+      assign days_key = 'days_to_go_two'
+    elsif days_mod >= 3 and days_mod <= 10
+      assign days_key = 'days_to_go_few'
+    elsif days_left >= 100 and days_mod <= 2
+      assign days_key = 'days_to_go_other'
+    endif
+  endif
+
   assign venue_photo = m.cover_photo.value
   assign companions_max = max_guests | minus: 1
   if companions_max < 0
@@ -39,6 +57,7 @@
   endif
   assign fan_frames = settings.ete_fan_frames | default: 0 | plus: 0
 -%}
+{%- capture companions_max_display -%}{% render 'inv-digits', value: companions_max, lang: lang %}{%- endcapture -%}
 
 <div
   class="inv inv--ete"
@@ -51,6 +70,7 @@
   data-title="{{ k | append: 'wedding_of' | t: names: names }}"
   data-venue="{{ m.venue_name.value | escape }}{% if m.venue_address.value != blank %}, {{ m.venue_address.value | newline_to_br | replace: '<br />', ', ' | strip_newlines | escape }}{% endif %}"
   data-demo="{{ is_demo }}"
+  data-hijri="{% if lang == 'ar' and m.show_hijri.value == true and m.date_note.value == blank %}true{% endif %}"
 >
   {%- comment -%} 1 · The envelope: tap and the flap lifts, then the envelope drops away onto the next page. {%- endcomment -%}
   {%- if show_envelope -%}
@@ -92,11 +112,16 @@
     {%- comment -%} 2 · Names, date and the garden: the trees sway like paper cut-outs. {%- endcomment -%}
     <header class="ete-slide ete-hero" data-inv-hero>
       <div class="ete-hero__text">
-        <p class="ete-kicker" data-inv-reveal>{{ intro | escape | newline_to_br }}</p>
+        <p class="ete-kicker" data-inv-reveal>{{ intro }}</p>
         <h1 class="ete-names" data-inv-reveal>
           <span>{{ p1 }}</span> <span class="ete-names__amp">{{ amp }}</span> <span>{{ p2 }}</span>
         </h1>
         <p class="ete-caps ete-hero__date" data-inv-reveal>{{ date_display }}</p>
+        {%- if m.date_note.value != blank -%}
+          <p class="ete-hero__note" data-inv-reveal>{{ m.date_note.value | escape }}</p>
+        {%- elsif lang == 'ar' and m.show_hijri.value == true -%}
+          <p class="ete-hero__note" data-inv-reveal data-hijri-target></p>
+        {%- endif -%}
       </div>
       <div class="ete-hero__scene" aria-hidden="true" data-ete-garden>
         {%- liquid
@@ -122,20 +147,25 @@
     </header>
 
     {%- comment -%} 3 · Live countdown to the wedding date. {%- endcomment -%}
+    {%- if s.show_countdown -%}
     <section
       class="ete-slide ete-countdown"
       data-ete-countdown
       data-one="{{ k | append: 'day_to_go' | t }}"
+      data-two="{{ k | append: 'days_to_go_two' | t }}"
+      data-few="{{ k | append: 'days_to_go_few' | t }}"
       data-many="{{ k | append: 'days_to_go' | t }}"
+      data-other="{{ k | append: 'days_to_go_other' | t }}"
       data-today="{{ k | append: 'today' | t }}"
       data-married="{{ k | append: 'married' | t }}"
     >
       <img class="ete-abs ete-abs--top ete-countdown__lights" src="{{ 'ete-bunting.webp' | asset_url }}" alt="" width="2400" height="840" loading="lazy" decoding="async" style="--x:0;--y:173.3;--w:1366">
       <p class="ete-countdown__num ete-caps" data-inv-reveal><span data-ete-days>{% render 'inv-digits', value: days_left, lang: lang %}</span></p>
       <p class="ete-kicker ete-countdown__label" data-inv-reveal data-ete-days-label>
-        {%- if days_left == 1 -%}{{ k | append: 'day_to_go' | t }}{%- else -%}{{ k | append: 'days_to_go' | t }}{%- endif -%}
+        {{- k | append: days_key | t -}}
       </p>
     </section>
+    {%- endif -%}
 
     {%- comment -%} 4 · Scratch the lace frame to reveal the venue photo underneath. {%- endcomment -%}
     <section class="ete-slide ete-venue" aria-labelledby="EteVenueTitle">
@@ -182,17 +212,17 @@
             continue
           endif
           assign parts = clean | split: '|'
-          assign c_title = parts[0] | strip
-          assign c_venue = parts[1] | strip
-          assign c_date = parts[2] | strip
-          assign c_time = parts[3] | strip
+          assign c_title = parts[0] | strip | escape
+          assign c_venue = parts[1] | strip | escape
+          assign c_date = parts[2] | strip | replace: '٠', '0' | replace: '١', '1' | replace: '٢', '2' | replace: '٣', '3' | replace: '٤', '4' | replace: '٥', '5' | replace: '٦', '6' | replace: '٧', '7' | replace: '٨', '8' | replace: '٩', '9'
+          assign c_time = parts[3] | strip | replace: '٠', '0' | replace: '١', '1' | replace: '٢', '2' | replace: '٣', '3' | replace: '٤', '4' | replace: '٥', '5' | replace: '٦', '6' | replace: '٧', '7' | replace: '٨', '8' | replace: '٩', '9'
           assign c_map = parts[4] | strip
-          assign c_note = parts[5] | strip
+          assign c_note = parts[5] | strip | escape
           if c_venue == blank
-            assign c_venue = m.venue_name.value
+            assign c_venue = m.venue_name.value | escape
           endif
           if c_date == blank
-            assign c_date = ds
+            assign c_date = ds | date: '%Y-%m-%d'
           endif
           if c_time == blank
             assign c_time = m.event_time.value | default: '19:00'
@@ -201,37 +231,64 @@
             assign c_map = m.map_url.value
           endif
 
+          # Map links always open the map, even when pasted without https://
+          if c_map != blank
+            assign c_scheme = c_map | downcase | slice: 0, 8
+            unless c_scheme contains 'http://' or c_scheme contains 'https://'
+              assign c_map = 'https://' | append: c_map
+            endunless
+          endif
+
+          # Date: YYYY-MM-DD is formatted; anything else is shown as written.
+          assign c_date_ok = false
+          assign c_dp = c_date | split: '-'
+          if c_dp.size == 3
+            assign c_digits = c_date | remove: '-' | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
+            if c_digits == blank and c_dp[0].size == 4 and c_dp[1].size <= 2 and c_dp[2].size <= 2
+              assign c_date_ok = true
+            endif
+          endif
+
+          # Time: 24-hour HH:MM becomes "3 PM" / "3:30 PM"; anything else is shown as written.
+          assign c_time_label = c_time | escape
           assign c_t = c_time | split: ':'
-          assign c_h24 = c_t[0] | plus: 0
-          assign c_min = c_t[1] | default: '00'
-          assign c_h12 = c_h24 | modulo: 12
-          if c_h12 == 0
-            assign c_h12 = 12
-          endif
-          if lang == 'ar'
-            if c_h24 >= 12
-              assign c_mer = 'مساءً'
-            else
-              assign c_mer = 'صباحًا'
+          if c_t.size == 2 and c_t[1].size == 2
+            assign c_digits = c_time | remove: ':' | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
+            assign c_h24 = c_t[0] | plus: 0
+            assign c_min = c_t[1] | plus: 0
+            if c_digits == blank and c_h24 < 24 and c_min < 60
+              assign c_h12 = c_h24 | modulo: 12
+              if c_h12 == 0
+                assign c_h12 = 12
+              endif
+              if lang == 'ar'
+                if c_h24 >= 12
+                  assign c_mer = 'مساءً'
+                else
+                  assign c_mer = 'صباحًا'
+                endif
+              else
+                if c_h24 >= 12
+                  assign c_mer = 'PM'
+                else
+                  assign c_mer = 'AM'
+                endif
+              endif
+              assign c_time_label = c_h12
+              if c_min > 0
+                assign c_time_label = c_time_label | append: ':' | append: c_t[1]
+              endif
+              assign c_time_label = c_time_label | append: ' ' | append: c_mer
             endif
-          else
-            if c_h24 >= 12
-              assign c_mer = 'PM'
-            else
-              assign c_mer = 'AM'
-            endif
           endif
-          assign c_time_label = c_h12
-          if c_min != '00'
-            assign c_time_label = c_time_label | append: ':' | append: c_min
-          endif
-          assign c_time_label = c_time_label | append: ' ' | append: c_mer
         -%}
         <article class="ete-card ete-event" data-inv-reveal>
           <h3 class="ete-event__title">{{ c_title }}</h3>
           <p class="ete-script ete-event__venue">{{ c_venue }}</p>
           <p class="ete-caps ete-event__date">
-            {%- if lang == 'ar' -%}
+            {%- if c_date_ok == false -%}
+              {%- render 'inv-digits', value: c_date, lang: lang -%}
+            {%- elsif lang == 'ar' -%}
               {%- render 'inv-date', date: c_date, lang: lang, weekday: false -%}
             {%- else -%}
               {{- c_date | date: '%B %-d, %Y' -}}
@@ -263,11 +320,11 @@
             {%- assign parts = clean | split: '|' -%}
             <li class="ete-timeline__item" data-inv-reveal>
               {%- if parts.size > 1 -%}
-                <span class="ete-caps ete-timeline__time">{{ parts[0] | strip }}</span>
-                <span class="ete-timeline__label">{{ parts[1] | strip }}</span>
+                <span class="ete-caps ete-timeline__time">{{ parts[0] | strip | escape }}</span>
+                <span class="ete-timeline__label">{{ parts[1] | strip | escape }}</span>
               {%- else -%}
                 <span class="ete-caps ete-timeline__time"></span>
-                <span class="ete-timeline__label">{{ clean }}</span>
+                <span class="ete-timeline__label">{{ clean | escape }}</span>
               {%- endif -%}
             </li>
           {%- endfor -%}
@@ -345,7 +402,7 @@
                   <button type="button" class="ete-chip" data-ete-add="adult">{{ k | append: 'add_adult' | t }}</button>
                   <button type="button" class="ete-chip" data-ete-add="child">{{ k | append: 'add_child' | t }}</button>
                 </div>
-                <p class="ete-field__hint ete-companions__max" data-ete-companions-max hidden>{{ k | append: 'companions_max' | t: count: companions_max }}</p>
+                <p class="ete-field__hint ete-companions__max" data-ete-companions-max hidden>{{ k | append: 'companions_max' | t: count: companions_max_display }}</p>
               </div>
             {%- endif -%}
           </div>
@@ -376,7 +433,7 @@
                 {%- if form.posted_successfully? -%}
                   <p class="ete-rsvp__thanks" role="status">{{ k | append: 'thanks' | t }}</p>
                 {%- else -%}
-                  <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }} — {{ names }}">
+                  <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }} — {{ names | escape }}">
                   <input type="hidden" name="contact[Event date]" value="{{ ds | date: '%Y-%m-%d' }}">
                   {{ rsvp_fields }}
                   {%- if form.errors -%}<p class="ete-rsvp__error">{{ form.errors | default_errors }}</p>{%- endif -%}
@@ -400,11 +457,24 @@
       {%- if m.closing_line.value != blank -%}
         <p class="ete-footer__closing">{{ m.closing_line.value }}</p>
       {%- endif -%}
-      {%- if s.show_share -%}
-        <button type="button" class="ete-chip" data-inv-share>
-          {% render 'icon', name: 'share', size: 16 %} {{ k | append: 'share' | t }}
-        </button>
-      {%- endif -%}
+      <div class="ete-footer__actions">
+        {%- if s.show_calendar -%}
+          <div class="inv-calendar ete-calendar" data-calendar>
+            <button type="button" class="ete-chip" data-calendar-toggle aria-expanded="false">
+              {% render 'icon', name: 'calendar', size: 16 %} {{ k | append: 'add_to_calendar' | t }}
+            </button>
+            <div class="inv-calendar__menu" data-calendar-menu hidden>
+              <button type="button" data-calendar-ics>{{ k | append: 'calendar_apple' | t }}</button>
+              <a href="#" data-calendar-google target="_blank" rel="noopener">{{ k | append: 'calendar_google' | t }}</a>
+            </div>
+          </div>
+        {%- endif -%}
+        {%- if s.show_share -%}
+          <button type="button" class="ete-chip" data-inv-share>
+            {% render 'icon', name: 'share', size: 16 %} {{ k | append: 'share' | t }}
+          </button>
+        {%- endif -%}
+      </div>
       {%- if settings.invitation_credit -%}
         <a class="inv-footer__credit" href="{{ shop.url }}" target="_blank" rel="noopener">
           {% render 'brand-logo', variant: 'mark' %}

@@ -7,9 +7,9 @@ It does **not** upload the theme. Use the Shopify GitHub integration or `shopify
 | Step | What it creates |
 | --- | --- |
 | `definitions` | Product metafield definitions `maison.subtitle`, `name_ar`, `style`, `palette`, `demo_url_en`, `demo_url_ar` (pinned, storefront-readable). Also the `invitation` metaobject definition, with status, SEO and **web pages at `/pages/invitation/<handle>`** turned on. |
-| `products` | 4 designs (Ivoire, Minuit, Jardin, Sable). Each has **Language** variants English / Arabic / Bilingual with SKUs `<HANDLE>-EN`, `-AR` and `-BI`, and 7 images from `media/`, each variant showing its own card image. It also creates 2 add-ons (`express-delivery`, `rsvp-guest-list`). Nothing requires shipping, inventory isn't tracked, and everything is taxable and published to the Online Store. |
+| `products` | 5 designs (Ivoire, Minuit, Jardin, Sable, Été). Each has **Language** variants English / Arabic / Bilingual with SKUs `<HANDLE>-EN`, `-AR` and `-BI`, and 7 images from `media/`, each variant showing its own card image. It also creates 2 add-ons (`express-delivery`, `rsvp-guest-list`). Nothing requires shipping, inventory isn't tracked, and everything is taxable and published to the Online Store. |
 | `collections` | Smart collections `invitations` ("Wedding invitations", products tagged `invitation`) and `add-ons` (products tagged `addon`), both published. |
-| `invitations` | 8 demo invitations (`ivoire-en`, `ivoire-ar`, …), active, with each English page linked to its Arabic page and back through `alternate_invitation`. |
+| `invitations` | 10 demo invitations (`ivoire-en`, `ivoire-ar`, …), active, with each English page linked to its Arabic page and back through `alternate_invitation`. |
 | `pages` | `how-it-works`, `faq`, `about` and `contact`, each published with its `page.<handle>` template and an empty body (the templates hold the content). |
 
 ## 1. Get API credentials
@@ -67,7 +67,7 @@ exit code is non-zero if anything failed.
 **Re-running is safe.** Everything is looked up by handle first:
 
 - **Products** are upserted with `productSet`, so title, description, prices, type and variants go back to what `catalog.mjs` says. Tags are merged. Images are matched by alt text and reused, not uploaded again. Other media you added is kept.
-- **Metafield and metaobject definitions, collections and pages** that already exist are left alone. The exceptions: missing definition fields and capabilities are added, and pages get their template and published status fixed.
+- **Metafield and metaobject definitions, collections and pages** that already exist are left alone. The exceptions: missing definition fields and capabilities are added, new values in a field's choice list (such as a new design) are added to it, and pages get their template and published status fixed.
 - **Demo invitations** are reset to the catalogue values.
 
 If Shopify rejects a page template or the invitation web pages because the theme isn't published yet, the script

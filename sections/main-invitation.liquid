@@ -387,7 +387,7 @@
                 {%- if form.posted_successfully? -%}
                   <p class="inv-rsvp__thanks" role="status">{{ k | append: 'thanks' | t }}</p>
                 {%- else -%}
-                  <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }} — {{ names }}">
+                  <input type="hidden" name="contact[Invitation]" value="{{ m.system.handle }} — {{ names | escape }}">
                   <input type="hidden" name="contact[Event date]" value="{{ ds | date: '%Y-%m-%d' }}">
                   {{ rsvp_fields }}
                   <div class="inv-field">

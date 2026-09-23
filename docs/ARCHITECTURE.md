@@ -98,8 +98,9 @@ explaining the difference. When the site is in Arabic, the Arabic tab is selecte
 Built from the "Summer Wedding" Canva design: nine 1366 × 768 slides turned into one scrolling page.
 
 * **Scaling:** everything is sized in *design units* (`--u` in `invitation-ete.css`). Wide screens show the whole
-  slide; below about 1025 px the middle 620 units fill the screen and the left and right edges crop away, as the
-  design intends. Text has readable minimum sizes and sections grow when it needs room. Decorations are placed
+  slide. From about 1025 px down to 465 px a unit stays 0.75 px, so the left and right edges crop away progressively,
+  as the design intends; below that the middle 620 units fill the screen. On short screens (landscape phones) a
+  slide is never taller than the screen. Text has readable minimum sizes and sections grow when it needs room. Decorations are placed
   with their Canva coordinates (`style="--x:…;--y:…;--w:…"`).
 * **Envelope:** the envelope photo is cut into the flap and the pocket along the flap's edge (`clip-path`). On
   tap, `invitation.js` sets `is-opening`: the flap swings up and away, page two shows through the opening, and
@@ -112,7 +113,10 @@ Built from the "Summer Wedding" Canva design: nine 1366 × 768 slides turned int
   under the lace frame. About half scratched away reveals the rest. Keyboard users get a "Reveal the venue" button.
 * **Fan:** scroll position → frame number. Built-in frames cut the still image into 16 pleats that fold onto the
   top guard. With the theme setting *Été design → Fan animation frames* set to N, it plays `ete-fan-001.webp` …
-  `ete-fan-NNN.webp` from the theme's assets on a canvas instead, one frame per step of scroll.
+  `ete-fan-NNN.webp` from the theme's assets on a canvas instead, one frame per step of scroll. Frames start
+  loading when the timeline is about a screen and a half away; the built-in frames play until the first arrives.
+* **Also shared:** the Hijri date / date note under the date, Add to calendar and Share in the footer, music,
+  the language switch; the countdown follows the section's *Show countdown* setting.
 * **RSVP:** the same four delivery methods as the other designs, plus dietary requirements, companions (adult /
   child, name + allergies, capped at *Max guests per reply* − 1) and a song request. Companions are sent as one
   `Companions` field; `Guests` is 1 + companions.

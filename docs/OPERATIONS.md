@@ -74,14 +74,14 @@ A "design" is one set of styles applied to the same invitation structure, so add
    `.inv--rose`) and set the colours and fonts. Add hero decorations in the matching `.inv--rose …` rules.
 2. **Ornaments (optional):** add a `when 'rose'` case in `snippets/invitation-ornament.liquid`
    (SVG line art: crest, divider, corner).
-3. **Content type:** in Shopify admin → Custom data → Invitation → **Design** field, add `rose` to the choices.
-   (Also add it to `tools/data/catalog.mjs` so the scripts know about it.)
+3. **Content type:** add `rose` to the `design` field's `choices` in `tools/data/catalog.mjs`. The setup script
+   (step 4) adds it to the **Design** field in Shopify; by hand it's Settings → Custom data → Invitation → Design.
 4. **Demo + photos:** add the design to `DESIGNS` and two demo entries to `DEMO_INVITATIONS` in
    `tools/data/catalog.mjs`, then run:
    ```bash
    npm run preview:build   # renders the new demo pages
    npm run images          # screenshots them into product photos in tools/shopify-setup/media/
-   npm run setup:store -- --only=products,invitations
+   npm run setup:store -- --only=definitions,products,invitations
    ```
 5. Check it in the preview (`npm run preview`) before pushing.
 
@@ -92,7 +92,9 @@ Fonts: invitation fonts are self-hosted in `assets/`. To add one, append it to `
 
 ## 3b. The Été design (Summer Wedding)
 
-Été follows the Canva design section by section and uses a few extra fields:
+Été follows the Canva design section by section and uses a few extra fields. **On a store set up before Été**,
+run `npm run setup:store -- --only=definitions,products,invitations` once: it adds `ete` to the Design choices and
+the Celebrations and Gifts note fields, then creates the Été product and its two demos.
 
 | Section | Comes from |
 |---|---|
@@ -100,10 +102,14 @@ Fonts: invitation fonts are self-hosted in `assets/`. To add one, append it to `
 | Names & date | *Opening line* (default "We're getting married!"), the two names, *Date* |
 | Days to go | *Date*, counted live in the guest's browser |
 | Scratch to reveal | **Photo** (the venue picture guests scratch to uncover; the design's villa photo if empty), *Venue*, *Venue address* |
-| The Celebrations | **Celebrations**: one card per line, `Title \| Venue \| YYYY-MM-DD \| HH:MM \| Map link \| Note`. Leave a part empty to use the main venue, date, time or map link, e.g. `The Wedding \| \| \| \| \| all welcome`. Empty field = a single wedding card |
+| The Celebrations | **Celebrations**: one card per line, `Title \| Venue \| YYYY-MM-DD \| HH:MM (24-hour) \| Map link \| Note`. Leave a part empty to use the main venue, date, time or map link, e.g. `The Wedding \| \| \| \| \| all welcome`. Empty field = a single wedding card |
 | Wedding Day Timeline | *Programme*, one line per item: `11:00 am \| Wedding Ceremony` |
 | Gifts | **Gifts note** (section hidden when empty) |
 | RSVP | *RSVP method* as usual. *Max guests per reply* caps companions (max − 1) |
+| Footer | *Closing line*, Add to calendar and Share (theme editor: the Invitation section's checkboxes) |
+
+Été doesn't show *Hosts*, *Invitation wording*, *Dress code*, *A note from the couple* or *Embed map*; the design
+has no place for them. *Show Hijri date* and *Date note* appear under the date on page two.
 
 **VIEW ON MAP** opens the card's map link. The demo uses placeholder Google Maps links; paste the real share link
 (Google Maps → Share → Copy link) into *Map link* or into the celebration line.
@@ -115,10 +121,11 @@ a built-in animation made from the still image. To use your own frame-by-frame a
    roughly the shape of `assets/ete-fan.webp`.
 2. Turn it into numbered frames (40–80 is plenty):
    ```bash
-   ffmpeg -i fan.mov -vf "fps=24,scale=960:-1" -c:v libwebp -quality 80 assets/ete-fan-%03d.webp
+   ffmpeg -i fan.mov -vf "fps=24,scale=640:-1" -c:v libwebp -quality 70 assets/ete-fan-%03d.webp
    ```
+   Keep each frame small (aim for under ~60 KB): guests download them all once they scroll near the timeline.
 3. Push the theme, then in **Online Store → Themes → Customize → Theme settings → Invitations → Été design**, set
-   **Fan animation frames** to the number of files.
+   **Fan animation frames** to the number of files. If the first frame can't be found, the built-in animation plays.
 
 To regenerate Été's product photos after changing the design: `npm run preview:build && npm run images -- --only=ete`.
 

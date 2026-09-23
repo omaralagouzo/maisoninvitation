@@ -29,22 +29,36 @@
   const heroItems = [...root.querySelectorAll('.inv-hero [data-inv-reveal], [data-inv-hero] [data-inv-reveal]')];
   heroItems.forEach((el, i) => el.style.setProperty('--i', i));
 
+  // While the envelope is closed, the invitation behind it can't be reached by keyboard or
+  // screen reader (and so can't scroll underneath it).
+  const behind = envelope ? [...root.children].filter((el) => el !== envelope) : [];
+
   const finishOpen = () => {
+    const hadFocus = envelope?.contains(document.activeElement);
     root.classList.add('is-open');
     html.classList.remove('inv-locked');
+    behind.forEach((el) => (el.inert = false));
     heroItems.forEach((el) => el.classList.remove('inv-hold'));
+    // Keyboard and screen-reader users continue from the couple's names, not from <body>.
+    const heading = hadFocus && root.querySelector(':is(.inv-hero, [data-inv-hero]) h1');
+    if (heading) {
+      heading.tabIndex = -1;
+      heading.focus({ preventScroll: true });
+    }
   };
 
   if (skipEnvelope) {
     finishOpen();
   } else {
     html.classList.add('inv-locked');
+    behind.forEach((el) => (el.inert = true));
     heroItems.forEach((el) => el.classList.add('inv-hold'));
     const opener = envelope.querySelector('[data-envelope-open]');
     let opened = false;
     const open = () => {
       if (opened) return;
       opened = true;
+      window.scrollTo(0, 0);
       root.classList.add('is-opening');
       playMusic();
       setTimeout(finishOpen, reduceMotion ? 0 : 1650);
@@ -167,8 +181,15 @@
   const status = root.querySelector('[data-rsvp-status]');
   const showStatus = (text) => {
     if (!status) return;
-    status.textContent = text;
+    // Show the (empty) live region first, then fill it and move focus to it: the form that
+    // had focus is about to be hidden, and a region that appears already filled is often
+    // not announced.
     status.hidden = false;
+    status.tabIndex = -1;
+    requestAnimationFrame(() => {
+      status.textContent = text;
+      status.focus();
+    });
   };
   root.querySelectorAll('.inv-rsvp__form').forEach((form) => {
     const mode = form.dataset.rsvp || 'form';

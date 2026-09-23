@@ -48,7 +48,11 @@
     <title>{{ title }}</title>
     <meta name="description" content="{{ description | strip | escape_once }}">
     {%- liquid
-      assign share_image = m.cover_photo.value
+      # Été hides the photo under its scratch card, so its link preview never shows it.
+      assign share_image = nil
+      unless design == 'ete'
+        assign share_image = m.cover_photo.value
+      endunless
     -%}
     <meta property="og:site_name" content="{{ shop.name }}">
     <meta property="og:type" content="website">
@@ -69,7 +73,9 @@
     {{ 'invitation.css' | asset_url | stylesheet_tag }}
     {%- if design == 'ete' -%}
       {{ 'invitation-ete.css' | asset_url | stylesheet_tag }}
-      {{ 'ete-envelope.jpg' | asset_url | preload_tag: as: 'image' }}
+      {%- if settings.invitation_envelope and request.design_mode == false -%}
+        {{ 'ete-envelope.jpg' | asset_url | preload_tag: as: 'image' }}
+      {%- endif -%}
     {%- endif -%}
     <script>
       (function () {

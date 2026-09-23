@@ -545,6 +545,8 @@ body.inv-body--ivoire { background: #F7F3EC; }
 }
 .inv--minuit .inv-envelope { background: radial-gradient(120% 90% at 50% 20%, #1A2240, #0C111E 75%); }
 .inv-embed .inv-envelope, .inv-skip-envelope .inv-envelope, .inv.is-open .inv-envelope { opacity: 0; visibility: hidden; pointer-events: none; }
+/* Without JavaScript nothing can open the envelope, so don't show it. */
+html:not(.js) .inv-envelope { display: none; }
 .inv-envelope__scene { display: grid; justify-items: center; gap: 30px; width: 100%; }
 .inv-envelope__to { margin: 0; font-family: var(--inv-font-display); font-size: 0.88rem; letter-spacing: var(--inv-display-tracking); text-transform: var(--inv-display-case); color: var(--inv-muted); }
 .inv[lang='ar'] .inv-envelope__to { font-size: 1.3rem; color: var(--inv-ink); }

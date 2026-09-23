@@ -44,9 +44,14 @@ function getSheet_() {
     sheet.appendRow(HEADERS);
     sheet.setFrozenRows(1);
   }
-  // Sheets made by an older version of this script have fewer columns: add the new headings.
+  // Sheets made by an older version of this script have fewer columns: fill in the missing
+  // headings only, so renamed or translated ones are kept.
   const header = sheet.getRange(1, 1, 1, HEADERS.length);
-  if (header.getValues()[0].join('|') !== HEADERS.join('|')) header.setValues([HEADERS]);
-  header.setFontWeight('bold');
+  const row = header.getValues()[0];
+  const filled = row.map((v, i) => (v === '' ? HEADERS[i] : v));
+  if (filled.join('|') !== row.join('|')) {
+    header.setValues([filled]);
+    header.setFontWeight('bold');
+  }
   return sheet;
 }

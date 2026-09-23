@@ -36,8 +36,8 @@ shopify theme push --store maison-invitation.myshopify.com --unpublished
 
 ## 3. Create products, invitations and pages (10 min, automated)
 
-This script creates the four designs with English/Arabic/Bilingual variants and all photos, the two add-ons, the
-collections, the "Invitation" content type, all eight demo invitations and the four content pages.
+This script creates the five designs with English/Arabic/Bilingual variants and all photos, the two add-ons, the
+collections, the "Invitation" content type, all ten demo invitations and the four content pages.
 
 1. Follow **`tools/shopify-setup/README.md`** to create an app in the Shopify **Dev Dashboard** and copy its
    client ID and secret into a `.env` file. (Since 2026, Shopify no longer lets you create "custom apps" inside the

@@ -645,6 +645,9 @@ export default {
       getting_married: ['We’re getting married!', 'We’re getting married!'],
       days_to_go: ['Days to go!', 'Days to go!'],
       day_to_go: ['Day to go!', 'Day to go!'],
+      days_to_go_two: ['Days to go!', 'Days to go!'],
+      days_to_go_few: ['Days to go!', 'Days to go!'],
+      days_to_go_other: ['Days to go!', 'Days to go!'],
       today_short: ['Today!', 'Today!'],
       scratch_heading: ['Scratch to reveal the venue', 'Scratch to reveal the venue'],
       scratch_reveal: ['Reveal the venue', 'Reveal the venue'],
@@ -720,8 +723,12 @@ export default {
       error: ['حدث خطأ — يرجى المحاولة مرة أخرى.', 'حدث خطأ — يرجى المحاولة مرة أخرى.'],
       // Été design
       getting_married: ['سنحتفل بزفافنا!', 'سنحتفل بزفافنا!'],
+      // Arabic counts: 1 and 100+ → يوم · 2 → يومان · 3–10 → أيام · 11–99 → يومًا
       days_to_go: ['يومًا على الموعد!', 'يومًا على الموعد!'],
       day_to_go: ['يوم على الموعد!', 'يوم على الموعد!'],
+      days_to_go_two: ['يومان على الموعد!', 'يومان على الموعد!'],
+      days_to_go_few: ['أيام على الموعد!', 'أيام على الموعد!'],
+      days_to_go_other: ['يوم على الموعد!', 'يوم على الموعد!'],
       today_short: ['اليوم!', 'اليوم!'],
       scratch_heading: ['امسح لتكتشف المكان', 'امسح لتكتشف المكان'],
       scratch_reveal: ['اكشف المكان', 'اكشف المكان'],

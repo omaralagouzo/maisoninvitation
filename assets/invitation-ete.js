@@ -77,11 +77,17 @@
       return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())) / 864e5);
     };
     let counted = false;
+    // Arabic: يوم (1, 100+), يومان (2), أيام (3–10), يومًا (11–99), chosen by Intl.PluralRules.
+    const plural = window.Intl?.PluralRules ? new Intl.PluralRules(root.dataset.lang || 'en') : null;
+    const dayLabel = (n) => {
+      const form = plural ? plural.select(n) : n === 1 ? 'one' : 'other';
+      const { one, two, few, many, other } = countdown.dataset;
+      return (form === 'one' && one) || (form === 'two' && two) || (form === 'few' && few) || (form === 'other' && other) || many;
+    };
     const update = (animate = false) => {
       const n = daysLeft();
       numLine.hidden = n <= 0;
-      if (n > 1) label.textContent = countdown.dataset.many;
-      else if (n === 1) label.textContent = countdown.dataset.one;
+      if (n > 0) label.textContent = dayLabel(n);
       else label.textContent = n === 0 ? countdown.dataset.today : countdown.dataset.married;
       if (n <= 0) return;
       if (!animate || reduceMotion.matches) {
@@ -131,6 +137,12 @@
     const reveal = () => {
       if (revealed) return;
       revealed = true;
+      // The keyboard button disappears with the cover: move focus to what it revealed.
+      if (document.activeElement === revealButton) {
+        const name = root.querySelector('.ete-venue__name') || scratch.querySelector('.ete-scratch__photo');
+        name.tabIndex = -1;
+        name.focus({ preventScroll: true });
+      }
       scratch.classList.add('is-revealed');
     };
 
@@ -244,53 +256,16 @@
      frames are drawn from the still image: the leaf is cut into pleats that fold onto the
      top guard stick, the way a folding fan closes. */
   const fan = root.querySelector('[data-ete-fan]');
-  if (fan) {
-    const still = fan.querySelector('.ete-fan__img');
+  const still = fan?.querySelector('.ete-fan__img');
+  if (fan && still) {
     const frameCount = Number(fan.dataset.frames || 0);
-    const STEPS = frameCount || 48;
+    let steps = 48;
     let setFrame = () => {};
+    let lastIndex = -1;
+    let measure = () => {};
 
-    if (frameCount > 0 && still && /ete-fan\.webp/.test(still.src)) {
-      // Frame-by-frame: ete-fan-001.webp … ete-fan-NNN.webp, next to ete-fan.webp in the theme's assets.
-      fan.classList.add('has-frames');
-      const canvas = document.createElement('canvas');
-      canvas.className = 'ete-fan__canvas';
-      fan.appendChild(canvas);
-      const ctx = canvas.getContext('2d');
-      const frames = Array.from({ length: frameCount }, (_, i) => {
-        const im = new Image();
-        im.decoding = 'async';
-        im.src = still.src.replace(/ete-fan\.webp/, `ete-fan-${String(i + 1).padStart(3, '0')}.webp`);
-        return im;
-      });
-      let current = -1;
-      const draw = (index) => {
-        // Use the nearest frame that has finished loading.
-        let i = index;
-        while (i > 0 && !(frames[i].complete && frames[i].naturalWidth)) i--;
-        const im = frames[i];
-        if (!im.complete || !im.naturalWidth) return;
-        const rect = fan.getBoundingClientRect();
-        const dpr = Math.min(window.devicePixelRatio || 1, 2);
-        const cw = Math.round(rect.width * dpr);
-        const ch = Math.round(rect.height * dpr);
-        if (canvas.width !== cw || canvas.height !== ch) {
-          canvas.width = cw;
-          canvas.height = ch;
-        }
-        const scale = Math.min(cw / im.naturalWidth, ch / im.naturalHeight);
-        const dw = im.naturalWidth * scale;
-        const dh = im.naturalHeight * scale;
-        ctx.clearRect(0, 0, cw, ch);
-        ctx.drawImage(im, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
-      };
-      frames.forEach((im, i) => (im.onload = () => i <= current && draw(current)));
-      setFrame = (index) => {
-        current = index;
-        draw(index);
-      };
-    } else if (still) {
-      // Built-in frames from the still image.
+    // Built-in frames from the still image.
+    const pleats = () => {
       const W = 960;
       const H = 1361;
       const PX = 0.7565 * W; // the rivet
@@ -325,18 +300,79 @@
       layers.push(piece('circle(7.3% at 75.65% 51.89%)'));
       layers.forEach((el) => fan.appendChild(el));
       fan.classList.add('is-animated');
+      steps = 48;
       setFrame = (index) => {
-        const p = index / (STEPS - 1);
+        const p = index / (steps - 1);
         fan.style.setProperty('--p', p.toFixed(4));
-        fan.classList.toggle('is-open', index >= STEPS - 1);
+        fan.classList.toggle('is-open', index >= steps - 1);
+      };
+    };
+    pleats();
+
+    // Frame-by-frame (theme setting "Fan animation frames" = N): ete-fan-001.webp …
+    // ete-fan-NNN.webp next to ete-fan.webp in the theme's assets. They only start loading
+    // when the timeline gets close, and the built-in frames play until the first one arrives
+    // (and stay if it is missing).
+    let loadFrames = () => {};
+    if (frameCount > 1 && /ete-fan\.webp/.test(still.src)) {
+      loadFrames = () => {
+        loadFrames = () => {};
+        const url = (i) => still.src.replace(/ete-fan\.webp/, `ete-fan-${String(i + 1).padStart(3, '0')}.webp`);
+        const frames = new Array(frameCount);
+        const canvas = document.createElement('canvas');
+        canvas.className = 'ete-fan__canvas';
+        const ctx = canvas.getContext('2d');
+        let current = 0;
+        const draw = (index) => {
+          // The nearest frame that has finished loading.
+          let i = index;
+          while (i > 0 && !(frames[i]?.complete && frames[i].naturalWidth)) i--;
+          const im = frames[i];
+          if (!im?.naturalWidth) return;
+          const rect = fan.getBoundingClientRect();
+          const dpr = Math.min(window.devicePixelRatio || 1, 2);
+          const cw = Math.round(rect.width * dpr);
+          const ch = Math.round(rect.height * dpr);
+          if (canvas.width !== cw || canvas.height !== ch) {
+            canvas.width = cw;
+            canvas.height = ch;
+          }
+          const scale = Math.min(cw / im.naturalWidth, ch / im.naturalHeight);
+          const dw = im.naturalWidth * scale;
+          const dh = im.naturalHeight * scale;
+          ctx.clearRect(0, 0, cw, ch);
+          ctx.drawImage(im, (cw - dw) / 2, (ch - dh) / 2, dw, dh);
+        };
+        const first = new Image();
+        first.decoding = 'async';
+        first.onerror = () => console.warn(`Été fan: ${first.src} not found, using the built-in animation.`);
+        first.onload = () => {
+          frames[0] = first;
+          for (let i = 1; i < frameCount; i++) {
+            const im = new Image();
+            im.decoding = 'async';
+            im.onload = () => i <= current && draw(current);
+            im.src = url(i);
+            frames[i] = im;
+          }
+          fan.appendChild(canvas);
+          fan.classList.add('has-frames');
+          steps = frameCount;
+          setFrame = (index) => {
+            current = index;
+            draw(index);
+          };
+          lastIndex = -1;
+          measure();
+        };
+        first.src = url(0);
       };
     }
 
     // Scroll → frame. Closed while the fan's middle is below the screen; open once it
     // reaches the middle of the screen. Scrolling back up closes it again.
-    let lastIndex = -1;
     let ticking = false;
-    const measure = () => {
+    measure = () => {
       ticking = false;
       let p = 1;
       if (!reduceMotion.matches) {
@@ -345,7 +381,7 @@
         const centre = rect.top + rect.height / 2;
         p = clamp((vh * 1.02 - centre) / (vh * 0.5));
       }
-      const index = Math.round(p * (STEPS - 1));
+      const index = Math.round(p * (steps - 1));
       if (index !== lastIndex) {
         lastIndex = index;
         setFrame(index);
@@ -372,8 +408,14 @@
     };
     if ('IntersectionObserver' in window) {
       new IntersectionObserver(([entry]) => toggle(entry.isIntersecting), { rootMargin: '25% 0px 25% 0px' }).observe(fan);
+      new IntersectionObserver(([entry], io) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        loadFrames();
+      }, { rootMargin: '150% 0px 150% 0px' }).observe(fan);
     } else {
       toggle(true);
+      loadFrames();
     }
     measure();
     onReduceMotionChange(measure);
@@ -409,6 +451,10 @@
         return `${title}: ${name.value.trim() || '—'}${note ? ` (${note})` : ''}`;
       });
       const yes = attending();
+      // A guest who declines sends no dietary answer (disabled fields aren't submitted;
+      // the text comes back if they change their mind).
+      const diet = form.querySelector('[name="contact[Dietary requirements]"]');
+      if (diet) diet.disabled = !yes;
       if (summary) summary.value = yes ? lines.join('\n') : '';
       if (guestCount) guestCount.value = String(yes ? 1 + lines.length : 0);
       const full = lines.length >= max;
