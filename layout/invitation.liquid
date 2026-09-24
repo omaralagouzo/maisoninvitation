@@ -83,6 +83,10 @@
         d.className += ' js';
         if (/[?&]embed=1/.test(q)) d.className += ' inv-embed';
         if (/[?&]open=1/.test(q) || location.hash) d.className += ' inv-skip-envelope';
+        // If invitation.js never ran (blocked or failed to load), nothing could open the envelope.
+        addEventListener('load', function () {
+          if (!window.__invReady) d.className += ' inv-skip-envelope';
+        });
       })();
     </script>
     <script src="{{ 'invitation.js' | asset_url }}" defer></script>

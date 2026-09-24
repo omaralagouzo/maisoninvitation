@@ -27,7 +27,7 @@
   --ete-stripe: #FAF4EE;
   /* Herr Von Muellerhoff runs wider than the design's script, so it is set a little smaller. */
   --ete-script-scale: 0.8;
-  --u: max(min(100vw / 1366, 100vh / 720), min(100vw / 620, 0.75px, 100vh / 768));
+  --u: max(min(100vw / 1366, 100vh / 768), min(100vw / 620, 0.75px, 100vh / 768));
   --s: var(--u);
   background: var(--inv-bg);
   color: var(--ete-text);
@@ -36,7 +36,7 @@
   line-height: 1.4;
 }
 @supports (height: 100svh) {
-  .inv--ete { --u: max(min(100vw / 1366, 100svh / 720), min(100vw / 620, 0.75px, 100svh / 768)); }
+  .inv--ete { --u: max(min(100vw / 1366, 100svh / 768), min(100vw / 620, 0.75px, 100svh / 768)); }
 }
 @media (min-width: 700px) {
   .inv.inv--ete { background: var(--inv-bg); }
@@ -218,13 +218,16 @@ html:not(.js) .ete-envelope { display: none; }
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* The garden is 508 units tall from the bottom: the words get the rest, and when they need
+     more (a Hijri line, a long note, landscape phones) the slide grows instead of overlapping. */
+  padding-bottom: calc(508 * var(--g));
 }
 .ete-hero__text {
   position: relative;
   z-index: 1;
   display: grid;
   justify-items: center;
-  padding: calc(28 * var(--u)) 16px 0;
+  padding: calc(28 * var(--u)) 16px calc(12 * var(--u));
 }
 .ete-names {
   margin: calc(14 * var(--u)) 0 0;
@@ -249,6 +252,14 @@ html:not(.js) .ete-envelope { display: none; }
     justify-content: center;
   }
   .ete-hero__text { padding-block: 32px 12px; }
+}
+/* Landscape phones: smaller words so page two still fits the screen. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .ete-hero .ete-kicker { font-size: max(calc(46.7 * var(--u)), 20px); }
+  .ete-names { font-size: max(calc(81.5 * var(--u) * var(--ete-script-scale)), 30px); margin-top: 2px; }
+  .ete-hero__date { font-size: max(calc(32.4 * var(--u)), 14px); margin-top: 4px; }
+  .ete-hero__note { font-size: 13px; margin-top: 2px; }
+  .ete-hero__text { padding-top: 10px; }
 }
 
 /* ------------------------------------------------------------------ 3 · countdown */
@@ -330,14 +341,15 @@ html:not(.js) .ete-envelope { display: none; }
   font-size: max(calc(32.4 * var(--u)), 19px);
   color: var(--ete-title);
 }
-@media (max-width: 699px) {
-  .ete-hero__date, .ete-venue__name, .ete-venue__place { color: var(--ete-small); }
+/* Where these fall below 24px (phones, short screens) they use the darker brown. */
+@media (max-width: 699px), (max-height: 575px) {
+  .ete-hero__date, .ete-venue__name { color: var(--ete-small); }
 }
 .ete-venue__place {
   margin-top: calc(16 * var(--u));
   font-size: max(calc(26.7 * var(--u)), 17px);
   font-style: italic;
-  color: var(--ete-title);
+  color: var(--ete-small);
 }
 .inv--ete[lang='ar'] .ete-venue__place { font-style: normal; }
 
@@ -496,7 +508,7 @@ html:not(.js) .ete-envelope { display: none; }
 /* ------------------------------------------------------------------ 9 · RSVP */
 .ete-rsvp { padding: calc(49 * var(--u)) 16px calc(64 * var(--u)); }
 .ete-rsvp > .ete-title { margin-bottom: calc(39 * var(--u)); }
-.ete-rsvp__deadline { margin: calc(-20 * var(--u)) 0 calc(20 * var(--u)); font-size: max(calc(21.3 * var(--u)), 16px); font-style: italic; color: var(--ete-title); }
+.ete-rsvp__deadline { margin: calc(-20 * var(--u)) 0 calc(20 * var(--u)); font-size: max(calc(21.3 * var(--u)), 16px); font-style: italic; color: var(--ete-small); }
 .ete-rsvp__body { position: relative; z-index: 1; width: min(calc(539 * var(--u)), 100%); margin-inline: auto; text-align: start; }
 @media (max-width: 899px) { .ete-rsvp__vase { display: none; } }
 .inv--ete .ete-form { display: grid; gap: 0; }
@@ -552,7 +564,7 @@ html:not(.js) .ete-envelope { display: none; }
 }
 .ete-form input::placeholder { color: rgba(107, 87, 59, 0.8); opacity: 1; }
 .ete-form input[type='text']:focus,
-.ete-form input[type='email']:focus { outline: none; border-color: var(--ete-title); background: rgba(255, 255, 255, 0.6); }
+.ete-form input[type='email']:focus { outline: none; border-color: var(--ete-text); box-shadow: 0 0 0 1px var(--ete-text); background: rgba(255, 255, 255, 0.6); }
 .ete-form input[type='email'] { text-align: start; }
 .ete-rsvp__attending { display: grid; }
 .ete-companions .ete-field__hint { margin-top: max(calc(18 * var(--u)), 4px); }
@@ -640,9 +652,16 @@ html:not(.js) .ete-envelope { display: none; }
 /* ------------------------------------------------------------------ footer */
 .ete-footer { display: grid; justify-items: center; gap: 16px; padding: 24px 16px 56px; text-align: center; }
 .ete-footer__names { font-size: 3.2rem; line-height: 1; color: var(--ete-title); }
-.ete-footer__closing { font-size: 1.2rem; font-style: italic; color: var(--ete-title); }
+.ete-footer__closing { font-size: 1.2rem; font-style: italic; color: var(--ete-small); }
 .ete-footer__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.ete-footer .inv-calendar__menu { inset-block-start: auto; inset-block-end: calc(100% + 8px); }
+.ete-footer .inv-calendar__menu,
+[dir='rtl'] .ete-footer .inv-calendar__menu {
+  inset-block-start: auto;
+  inset-block-end: calc(100% + 8px);
+  inset-inline-start: 0;
+  translate: none;
+  max-width: calc(100vw - 32px);
+}
 .inv--ete .inv-footer__credit { font-family: var(--ete-serif); font-size: 0.85rem; letter-spacing: 0.04em; color: var(--ete-text); opacity: 1; }
 
 /* ------------------------------------------------------------------ motion */

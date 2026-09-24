@@ -43,6 +43,7 @@ function getSheet_() {
     sheet = ss.insertSheet(SHEET_NAME);
     sheet.appendRow(HEADERS);
     sheet.setFrozenRows(1);
+    sheet.getRange(1, 1, 1, HEADERS.length).setFontWeight('bold');
   }
   // Sheets made by an older version of this script have fewer columns: fill in the missing
   // headings only, so renamed or translated ones are kept.

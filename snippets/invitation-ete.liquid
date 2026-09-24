@@ -250,7 +250,7 @@
           endif
 
           # Time: 24-hour HH:MM becomes "3 PM" / "3:30 PM"; anything else is shown as written.
-          assign c_time_label = c_time | escape
+          assign c_time_label = c_time
           assign c_t = c_time | split: ':'
           if c_t.size == 2 and c_t[1].size == 2
             assign c_digits = c_time | remove: ':' | remove: '0' | remove: '1' | remove: '2' | remove: '3' | remove: '4' | remove: '5' | remove: '6' | remove: '7' | remove: '8' | remove: '9'
@@ -287,7 +287,8 @@
           <p class="ete-script ete-event__venue">{{ c_venue }}</p>
           <p class="ete-caps ete-event__date">
             {%- if c_date_ok == false -%}
-              {%- render 'inv-digits', value: c_date, lang: lang -%}
+              {%- capture c_date_text -%}{% render 'inv-digits', value: c_date, lang: lang %}{%- endcapture -%}
+              {{- c_date_text | escape -}}
             {%- elsif lang == 'ar' -%}
               {%- render 'inv-date', date: c_date, lang: lang, weekday: false -%}
             {%- else -%}
@@ -296,7 +297,8 @@
           </p>
           <p class="ete-caps ete-event__time">
             <img src="{{ 'ete-clock.webp' | asset_url }}" alt="" width="140" height="140" loading="lazy" decoding="async">
-            <span>{% render 'inv-digits', value: c_time_label, lang: lang %}</span>
+            {%- capture c_time_text -%}{% render 'inv-digits', value: c_time_label, lang: lang %}{%- endcapture -%}
+            <span>{{ c_time_text | escape }}</span>
           </p>
           {%- if c_map != blank -%}
             <a class="ete-event__map" href="{{ c_map | escape }}" target="_blank" rel="noopener">{{ k | append: 'view_on_map' | t }}</a>

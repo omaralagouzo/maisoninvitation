@@ -1,5 +1,6 @@
 /* Maison — live invitation behaviour: envelope, countdown, Hijri date, calendar,
    RSVP (Shopify form · Google Sheet · WhatsApp), music, share, reveal. */
+window.__invReady = true; // the layout opens the page without the envelope if this never runs
 (() => {
   const root = document.querySelector('[data-invitation]');
   if (!root) return;
@@ -174,7 +175,12 @@
       setOpen(menu.hidden);
     });
     document.addEventListener('click', (e) => !calendar.contains(e.target) && setOpen(false));
-    document.addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || menu.hidden) return;
+      const hadFocus = menu.contains(document.activeElement);
+      setOpen(false);
+      if (hadFocus) toggle.focus();
+    });
   }
 
   /* ---------------------------------------------------------------- rsvp */

@@ -99,8 +99,8 @@ Built from the "Summer Wedding" Canva design: nine 1366 × 768 slides turned int
 
 * **Scaling:** everything is sized in *design units* (`--u` in `invitation-ete.css`). Wide screens show the whole
   slide. From about 1025 px down to 465 px a unit stays 0.75 px, so the left and right edges crop away progressively,
-  as the design intends; below that the middle 620 units fill the screen. On short screens (landscape phones) a
-  slide is never taller than the screen. Text has readable minimum sizes and sections grow when it needs room. Decorations are placed
+  as the design intends; below that the middle 620 units fill the screen. A slide is never taller than the screen
+  unless its content needs the room (page two grows rather than letting the words overlap the garden). Text has readable minimum sizes and sections grow when it needs room. Decorations are placed
   with their Canva coordinates (`style="--x:…;--y:…;--w:…"`).
 * **Envelope:** the envelope photo is cut into the flap and the pocket along the flap's edge (`clip-path`). On
   tap, `invitation.js` sets `is-opening`: the flap swings up and away, page two shows through the opening, and
