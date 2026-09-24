@@ -111,6 +111,7 @@
 
     {%- comment -%} 2 · Names, date and the garden: the trees sway like paper cut-outs. {%- endcomment -%}
     <header class="ete-slide ete-hero" data-inv-hero>
+      <div class="ete-slide__stage">
       <div class="ete-hero__text">
         <p class="ete-kicker" data-inv-reveal>{{ intro }}</p>
         <h1 class="ete-names" data-inv-reveal>
@@ -144,6 +145,7 @@
         <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t2 }}" alt="" width="219" height="689" style="--x:299;--b:0.7;--w:73" data-sway>
         <img class="ete-abs ete-abs--bottom ete-tree" src="{{ t1 }}" alt="" width="306" height="713" style="--x:213.7;--b:0.3;--w:102" data-sway>
       </div>
+      </div>
     </header>
 
     {%- comment -%} 3 · Live countdown to the wedding date. {%- endcomment -%}
@@ -159,16 +161,19 @@
       data-today="{{ k | append: 'today' | t }}"
       data-married="{{ k | append: 'married' | t }}"
     >
+      <div class="ete-slide__stage">
       <img class="ete-abs ete-abs--top ete-countdown__lights" src="{{ 'ete-bunting.webp' | asset_url }}" alt="" width="2400" height="840" loading="lazy" decoding="async" style="--x:0;--y:173.3;--w:1366">
       <p class="ete-countdown__num ete-caps" data-inv-reveal><span data-ete-days>{% render 'inv-digits', value: days_left, lang: lang %}</span></p>
       <p class="ete-kicker ete-countdown__label" data-inv-reveal data-ete-days-label>
         {{- k | append: days_key | t -}}
       </p>
+      </div>
     </section>
     {%- endif -%}
 
     {%- comment -%} 4 · Scratch the lace frame to reveal the venue photo underneath. {%- endcomment -%}
     <section class="ete-slide ete-venue" aria-labelledby="EteVenueTitle">
+      <div class="ete-slide__stage">
       <h2 class="ete-title" id="EteVenueTitle" data-inv-reveal>{{ k | append: 'scratch_heading' | t }}</h2>
       <div class="ete-scratch" data-ete-scratch data-inv-reveal>
         <div class="ete-scratch__window">
@@ -186,6 +191,7 @@
       {%- if m.venue_address.value != blank -%}
         <p class="ete-venue__place" data-inv-reveal>{{ m.venue_address.value | newline_to_br | replace: '<br />', ', ' | strip_newlines }}</p>
       {%- endif -%}
+      </div>
     </section>
 
     {%- comment -%} 5–6 · The celebrations, one card each (field "celebrations", or the wedding itself). {%- endcomment -%}
@@ -203,9 +209,8 @@
         assign celebration_lines = k | append: 'the_wedding' | t | split: '|||'
       endif
     -%}
-    <section class="ete-celebrations" aria-labelledby="EteCelebrations">
-      <h2 class="ete-title" id="EteCelebrations" data-inv-reveal>{{ k | append: 'celebrations' | t }}</h2>
-      {%- for line in celebration_lines -%}
+    {%- assign card_count = 0 -%}
+    {%- for line in celebration_lines -%}
         {%- liquid
           assign clean = line | strip_newlines | strip
           if clean == blank
@@ -282,6 +287,12 @@
             endif
           endif
         -%}
+        {%- assign card_count = card_count | plus: 1 -%}
+        <section class="ete-slide ete-celebrations{% if card_count == 1 %} ete-celebrations--first{% endif %}"{% if card_count == 1 %} aria-labelledby="EteCelebrations"{% else %} aria-label="{{ c_title }}"{% endif %}>
+          <div class="ete-slide__stage">
+          {%- if card_count == 1 -%}
+            <h2 class="ete-title" id="EteCelebrations" data-inv-reveal>{{ k | append: 'celebrations' | t }}</h2>
+          {%- endif -%}
         <article class="ete-card ete-event" data-inv-reveal>
           <h3 class="ete-event__title">{{ c_title }}</h3>
           <p class="ete-script ete-event__venue">{{ c_venue }}</p>
@@ -307,12 +318,14 @@
             <p class="ete-script ete-event__note">{{ c_note }}</p>
           {%- endif -%}
         </article>
-      {%- endfor -%}
-    </section>
+          </div>
+        </section>
+    {%- endfor -%}
 
     {%- comment -%} 7 · The day's timeline; the fan opens frame by frame as you scroll onto it. {%- endcomment -%}
     {%- if m.schedule.value != blank -%}
       <section class="ete-slide ete-timeline" aria-labelledby="EteTimeline" data-ete-fan-section>
+        <div class="ete-slide__stage">
         <h2 class="ete-title" id="EteTimeline" data-inv-reveal>{{ k | append: 'timeline' | t }}</h2>
         <ol class="ete-timeline__list" role="list">
           {%- assign lines = m.schedule.value | newline_to_br | split: '<br />' -%}
@@ -339,16 +352,19 @@
         >
           <img class="ete-fan__img" src="{{ 'ete-fan.webp' | asset_url }}" alt="" width="960" height="1361" loading="lazy" decoding="async">
         </div>
+        </div>
       </section>
     {%- endif -%}
 
     {%- comment -%} 8 · Gifts. {%- endcomment -%}
     {%- if m.gifts_note.value != blank -%}
       <section class="ete-slide ete-gifts" aria-labelledby="EteGifts">
+        <div class="ete-slide__stage">
         <img class="ete-gifts__envelope" src="{{ 'ete-gift.webp' | asset_url }}" alt="" width="600" height="362" loading="lazy" decoding="async" data-inv-reveal>
         <div class="ete-card ete-gifts__card" data-inv-reveal>
           <h2 class="ete-title" id="EteGifts">{{ k | append: 'gifts' | t }}</h2>
           <p class="ete-gifts__text">{{ m.gifts_note.value | escape | newline_to_br }}</p>
+        </div>
         </div>
       </section>
     {%- endif -%}
@@ -356,6 +372,7 @@
     {%- comment -%} 9 · RSVP. {%- endcomment -%}
     {%- unless rsvp_mode == 'none' -%}
       <section class="ete-slide ete-rsvp" id="rsvp" aria-labelledby="EteRsvp">
+        <div class="ete-slide__stage">
         <img class="ete-abs ete-abs--top ete-rsvp__vase" src="{{ 'ete-vase.webp' | asset_url }}" alt="" width="393" height="760" loading="lazy" decoding="async" style="--x:1157.7;--y:391;--w:180">
         <h2 class="ete-title" id="EteRsvp" data-inv-reveal>{{ k | append: 'rsvp' | t }}</h2>
         {%- if m.rsvp_deadline.value != blank -%}
@@ -450,6 +467,7 @@
             data-error="{{ k | append: 'error' | t }}"
             data-accept="{{ k | append: 'delighted_accept' | t }}"
             data-decline="{{ k | append: 'unable_attend' | t }}"></p>
+        </div>
         </div>
       </section>
     {%- endunless -%}

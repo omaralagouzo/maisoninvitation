@@ -369,17 +369,17 @@
       };
     }
 
-    // Scroll → frame. Closed while the fan's middle is below the screen; open once it
-    // reaches the middle of the screen. Scrolling back up closes it again.
+    // Scroll → frame. Closed while the timeline page is still coming up from below; fully
+    // open once the page has snapped into place at the top. Scrolling back up closes it.
+    const page = fan.closest('[data-ete-fan-section]') || fan;
     let ticking = false;
     measure = () => {
       ticking = false;
       let p = 1;
       if (!reduceMotion.matches) {
-        const rect = fan.getBoundingClientRect();
+        const top = page.getBoundingClientRect().top;
         const vh = window.innerHeight || document.documentElement.clientHeight;
-        const centre = rect.top + rect.height / 2;
-        p = clamp((vh * 1.02 - centre) / (vh * 0.5));
+        p = clamp(1 - top / (vh * 0.85));
       }
       const index = Math.round(p * (steps - 1));
       if (index !== lastIndex) {
@@ -419,6 +419,58 @@
     }
     measure();
     onReduceMotionChange(measure);
+  }
+
+  /* ---------------------------------------------------------------- pages
+     Each section is a page (CSS scroll snapping; swipes on phones snap natively). With a
+     mouse wheel or trackpad, a short scroll is read as "next page" and glides there, instead
+     of having to drag past the halfway point. Inside a page taller than the screen (the RSVP
+     form on small screens) the wheel scrolls normally until its end. */
+  const pages = [...root.querySelectorAll('.ete-slide, .ete-footer')];
+  const html = document.documentElement;
+  if (pages.length && !html.classList.contains('inv-embed')) {
+    const INTENT = 40; // px of wheel movement that means "go to the next page"
+    let quietUntil = 0;
+    let pending = 0;
+    let resetPending = 0;
+    const pageAt = () => pages.find((el) => {
+      const r = el.getBoundingClientRect();
+      return r.top <= 2 && r.bottom > 2;
+    }) || pages[0];
+    const go = (dir) => {
+      const y = window.scrollY;
+      const max = html.scrollHeight - window.innerHeight;
+      const tops = pages.map((el) => Math.min(max, Math.round(el.getBoundingClientRect().top + y)));
+      const target = dir > 0 ? tops.find((t) => t > y + 2) : [...tops].reverse().find((t) => t < y - 2);
+      if (target === undefined) return;
+      window.scrollTo({ top: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      quietUntil = performance.now() + 750;
+    };
+    window.addEventListener(
+      'wheel',
+      (e) => {
+        if (e.ctrlKey || html.classList.contains('inv-locked') || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+        const dir = Math.sign(e.deltaY);
+        if (!dir) return;
+        const now = performance.now();
+        const r = pageAt().getBoundingClientRect();
+        if (now >= quietUntil && ((dir > 0 && r.bottom > window.innerHeight + 2) || (dir < 0 && r.top < -2))) return;
+        e.preventDefault();
+        // Swallow the rest of a gesture (trackpad momentum) while a page change is under way.
+        if (now < quietUntil) {
+          quietUntil = Math.max(quietUntil, now + 160);
+          return;
+        }
+        pending += e.deltaY * (e.deltaMode === 1 ? 16 : 1);
+        clearTimeout(resetPending);
+        resetPending = setTimeout(() => (pending = 0), 220);
+        if (Math.abs(pending) >= INTENT) {
+          pending = 0;
+          go(dir);
+        }
+      },
+      { passive: false },
+    );
   }
 
   /* ---------------------------------------------------------------- RSVP companions */

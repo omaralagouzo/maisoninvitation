@@ -76,12 +76,27 @@ body.inv-body--ete { background: #FBF6F4; }
 
 /* ------------------------------------------------------------------ layout helpers */
 .ete-page { position: relative; }
+/* Each section is its own page: at least a screen tall, its 1366 × 768 slide (the stage)
+   centred in it, and scrolling snaps from one page to the next. */
+html.inv-html:has(> body.inv-body--ete) { scroll-snap-type: y mandatory; }
+html.inv-html.inv-embed:has(> body.inv-body--ete) { scroll-snap-type: none; }
 .ete-slide {
   position: relative;
-  min-height: calc(768 * var(--u));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
   overflow: hidden;
   text-align: center;
   isolation: isolate;
+  scroll-snap-align: start;
+}
+.inv-embed .ete-slide { min-height: calc(768 * var(--u)); }
+.ete-slide__stage {
+  position: relative;
+  width: 100%;
+  min-height: calc(768 * var(--u));
 }
 /* Decorations placed by their design coordinates: --x (left), --y (top) or --b (bottom), --w (width). */
 .ete-abs {
@@ -212,9 +227,8 @@ html:not(.js) .ete-envelope { display: none; }
 .inv.is-opening .ete-envelope__hint { opacity: 0; }
 
 /* ------------------------------------------------------------------ 2 · hero */
-.ete-hero {
-  --g: var(--u);
-  --s: var(--g);
+.ete-hero { --g: var(--u); --s: var(--g); }
+.ete-hero > .ete-slide__stage {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -244,8 +258,8 @@ html:not(.js) .ete-envelope { display: none; }
 .ete-tree { transform-origin: 50% 97%; transform: rotate(var(--r, 0deg)); will-change: transform; }
 /* Phones: a full screen, the garden a little larger and anchored at the bottom, the words centred above it. */
 @media (max-width: 699px) and (orientation: portrait) {
-  .ete-hero {
-    --g: calc(var(--u) * 1.25);
+  .ete-hero { --g: calc(var(--u) * 1.25); }
+  .ete-hero > .ete-slide__stage {
     min-height: 100vh;
     min-height: 100svh;
     padding-bottom: calc(508 * var(--g));
@@ -274,7 +288,7 @@ html:not(.js) .ete-envelope { display: none; }
 .inv--ete[lang='ar'] .ete-countdown__label { text-transform: none; }
 
 /* ------------------------------------------------------------------ 4 · scratch to reveal */
-.ete-venue { padding: calc(49 * var(--u)) 16px calc(55 * var(--u)); }
+.ete-venue > .ete-slide__stage { padding: calc(49 * var(--u)) 16px calc(55 * var(--u)); }
 .ete-scratch {
   position: relative;
   width: calc(520.3 * var(--u));
@@ -354,14 +368,13 @@ html:not(.js) .ete-envelope { display: none; }
 .inv--ete[lang='ar'] .ete-venue__place { font-style: normal; }
 
 /* ------------------------------------------------------------------ 5–6 · celebrations */
+.ete-celebrations > .ete-slide__stage { padding: calc(77 * var(--u)) 16px calc(148 * var(--u)); }
+.ete-celebrations--first > .ete-slide__stage { padding: calc(49 * var(--u)) 16px calc(77 * var(--u)); }
 .ete-celebrations {
-  position: relative;
-  padding: calc(49 * var(--u)) 16px calc(148 * var(--u));
-  text-align: center;
   background-color: var(--inv-bg);
   background-image: repeating-linear-gradient(90deg, var(--ete-stripe) 0 calc(12.24 * var(--u)), transparent 0 calc(23.71 * var(--u)));
 }
-.ete-celebrations > .ete-title { margin-bottom: calc(46 * var(--u)); }
+.ete-celebrations .ete-title { margin-bottom: calc(46 * var(--u)); }
 .ete-card {
   position: relative;
   width: min(calc(546 * var(--u)), 100%);
@@ -377,7 +390,6 @@ html:not(.js) .ete-envelope { display: none; }
   min-height: calc(543 * var(--u));
   padding: calc(54 * var(--u)) max(calc(24 * var(--u)), 14px) calc(29 * var(--u));
 }
-.ete-event + .ete-event { margin-top: calc(154 * var(--u)); }
 .ete-event__title {
   margin: 0;
   font-family: var(--ete-serif);
@@ -420,8 +432,8 @@ html:not(.js) .ete-envelope { display: none; }
 .inv--ete[lang='ar'] .ete-event__note { margin-top: max(calc(16 * var(--u)), 12px); line-height: 1.9; }
 
 /* ------------------------------------------------------------------ 7 · timeline + fan */
-.ete-timeline { padding: calc(49 * var(--u)) 16px calc(40 * var(--u)); }
-.ete-timeline > .ete-title { margin-bottom: calc(91 * var(--u)); }
+.ete-timeline > .ete-slide__stage { padding: calc(49 * var(--u)) 16px calc(40 * var(--u)); }
+.ete-timeline .ete-title { margin-bottom: calc(91 * var(--u)); }
 .ete-timeline__list {
   --tl-time: calc(170 * var(--u));
   --tl-label: calc(292 * var(--u));
@@ -483,14 +495,14 @@ html:not(.js) .ete-envelope { display: none; }
     position: relative;
     left: auto;
     top: auto;
-    width: min(74vw, 400px);
-    margin: 28px -7vw 0 auto;
+    width: min(74vw, 400px, 40svh * 960 / 1361);
+    margin: 20px -7vw 0 auto;
   }
   [dir='rtl'] .ete-fan { right: auto; margin: 28px auto 0 -7vw; }
 }
 
 /* ------------------------------------------------------------------ 8 · gifts */
-.ete-gifts { padding: calc(77 * var(--u)) 16px calc(90 * var(--u)); }
+.ete-gifts > .ete-slide__stage { padding: calc(77 * var(--u)) 16px calc(90 * var(--u)); }
 .ete-gifts__envelope { display: block; width: max(calc(229.6 * var(--u)), 140px); height: auto; margin-inline: auto; }
 .ete-gifts__card {
   margin-top: calc(54 * var(--u));
@@ -506,8 +518,8 @@ html:not(.js) .ete-envelope { display: none; }
 }
 
 /* ------------------------------------------------------------------ 9 · RSVP */
-.ete-rsvp { padding: calc(49 * var(--u)) 16px calc(64 * var(--u)); }
-.ete-rsvp > .ete-title { margin-bottom: calc(39 * var(--u)); }
+.ete-rsvp > .ete-slide__stage { padding: calc(49 * var(--u)) 16px calc(64 * var(--u)); }
+.ete-rsvp .ete-title { margin-bottom: calc(39 * var(--u)); }
 .ete-rsvp__deadline { margin: calc(-20 * var(--u)) 0 calc(20 * var(--u)); font-size: max(calc(21.3 * var(--u)), 16px); font-style: italic; color: var(--ete-small); }
 .ete-rsvp__body { position: relative; z-index: 1; width: min(calc(539 * var(--u)), 100%); margin-inline: auto; text-align: start; }
 @media (max-width: 899px) { .ete-rsvp__vase { display: none; } }
@@ -650,7 +662,7 @@ html:not(.js) .ete-envelope { display: none; }
 .ete-rsvp__error { font-style: normal; font-size: 1rem; color: #9B3D2E; }
 
 /* ------------------------------------------------------------------ footer */
-.ete-footer { display: grid; justify-items: center; gap: 16px; padding: 24px 16px 56px; text-align: center; }
+.ete-footer { scroll-snap-align: end; display: grid; justify-items: center; gap: 16px; padding: 24px 16px 56px; text-align: center; }
 .ete-footer__names { font-size: 3.2rem; line-height: 1; color: var(--ete-title); }
 .ete-footer__closing { font-size: 1.2rem; font-style: italic; color: var(--ete-small); }
 .ete-footer__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
