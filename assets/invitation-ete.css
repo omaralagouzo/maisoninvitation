@@ -77,9 +77,8 @@ body.inv-body--ete { background: #FBF6F4; }
 /* ------------------------------------------------------------------ layout helpers */
 .ete-page { position: relative; }
 /* Each section is its own page: at least a screen tall, its 1366 × 768 slide (the stage)
-   centred in it, and scrolling snaps from one page to the next. */
-html.inv-html:has(> body.inv-body--ete) { scroll-snap-type: y mandatory; }
-html.inv-html.inv-embed:has(> body.inv-body--ete) { scroll-snap-type: none; }
+   centred in it; invitation-ete.js glides from one page to the next. */
+html.inv-html:has(> body.inv-body--ete) { scroll-behavior: auto; overscroll-behavior-y: none; }
 .ete-slide {
   position: relative;
   display: flex;
@@ -90,7 +89,6 @@ html.inv-html.inv-embed:has(> body.inv-body--ete) { scroll-snap-type: none; }
   overflow: hidden;
   text-align: center;
   isolation: isolate;
-  scroll-snap-align: start;
 }
 .inv-embed .ete-slide { min-height: calc(768 * var(--u)); }
 .ete-slide__stage {
@@ -518,32 +516,32 @@ html:not(.js) .ete-envelope { display: none; }
 }
 
 /* ------------------------------------------------------------------ 9 · RSVP */
-.ete-rsvp > .ete-slide__stage { padding: calc(49 * var(--u)) 16px calc(64 * var(--u)); }
-.ete-rsvp .ete-title { margin-bottom: calc(39 * var(--u)); }
+.ete-rsvp > .ete-slide__stage { padding: calc(30 * var(--u)) 16px calc(24 * var(--u)); }
+.ete-rsvp .ete-title { margin-bottom: calc(16 * var(--u)); }
 .ete-rsvp__deadline { margin: calc(-20 * var(--u)) 0 calc(20 * var(--u)); font-size: max(calc(21.3 * var(--u)), 16px); font-style: italic; color: var(--ete-small); }
 .ete-rsvp__body { position: relative; z-index: 1; width: min(calc(539 * var(--u)), 100%); margin-inline: auto; text-align: start; }
 @media (max-width: 899px) { .ete-rsvp__vase { display: none; } }
 .inv--ete .ete-form { display: grid; gap: 0; }
-.ete-field { margin: 0; margin-top: max(calc(18 * var(--u)), 16px); padding: 0; border: 0; min-width: 0; }
+.ete-field { margin: 0; margin-top: max(calc(10 * var(--u)), 10px); padding: 0; border: 0; min-width: 0; }
 .ete-field.ete-choice { margin-top: 0; }
 .ete-field > label,
 .ete-field > legend,
 .ete-field__label {
   display: block;
-  margin-bottom: max(calc(9 * var(--u)), 6px);
+  margin-bottom: 4px;
   padding: 0;
-  font-size: max(calc(21.3 * var(--u)), 17px);
+  font-size: max(calc(19 * var(--u)), 16px);
   line-height: 1.4;
   color: var(--ete-text);
 }
-.ete-field__hint { font-size: max(calc(21.3 * var(--u)), 16px); line-height: 1.4; color: rgba(107, 87, 59, 0.85); }
+.ete-field__hint { font-size: max(calc(17 * var(--u)), 15px); line-height: 1.35; color: rgba(107, 87, 59, 0.85); }
 .ete-choice > label {
   display: flex;
   align-items: center;
   gap: max(calc(13 * var(--u)), 10px);
   width: fit-content;
-  min-height: max(calc(23 * var(--u)), 28px);
-  font-size: max(calc(21.3 * var(--u)), 17px);
+  min-height: max(calc(23 * var(--u)), 26px);
+  font-size: max(calc(19 * var(--u)), 16px);
   line-height: 1.2;
   cursor: pointer;
 }
@@ -564,7 +562,7 @@ html:not(.js) .ete-envelope { display: none; }
 .ete-form input[type='email'] {
   display: block;
   width: min(calc(511 * var(--u)), 100%);
-  height: max(calc(50 * var(--u)), 46px);
+  height: max(calc(42 * var(--u)), 42px);
   padding: 0 max(calc(12 * var(--u)), 12px);
   border: 2px solid var(--ete-field);
   border-radius: max(calc(12 * var(--u)), 10px);
@@ -579,9 +577,9 @@ html:not(.js) .ete-envelope { display: none; }
 .ete-form input[type='email']:focus { outline: none; border-color: var(--ete-text); box-shadow: 0 0 0 1px var(--ete-text); background: rgba(255, 255, 255, 0.6); }
 .ete-form input[type='email'] { text-align: start; }
 .ete-rsvp__attending { display: grid; }
-.ete-companions .ete-field__hint { margin-top: max(calc(18 * var(--u)), 4px); }
+.ete-companions .ete-field__hint { margin-top: 0; }
 .ete-companions__list { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
-.ete-companions__list:not(:empty) { margin-top: 14px; }
+.ete-companions__list:not(:empty) { margin-top: 8px; }
 .ete-companion {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
@@ -608,14 +606,14 @@ html:not(.js) .ete-envelope { display: none; }
   .ete-companion input[data-field='allergies'] { grid-column: 1; grid-row: 3; }
   .ete-companion__remove { grid-row: 2 / 4; grid-column: 2; height: auto; align-self: stretch; }
 }
-.ete-companions__add { display: flex; flex-wrap: wrap; gap: max(calc(16 * var(--u)), 10px); margin-top: max(calc(18 * var(--u)), 12px); }
+.ete-companions__add { display: flex; flex-wrap: wrap; gap: max(calc(16 * var(--u)), 10px); margin-top: 8px; }
 .ete-chip {
   display: inline-flex;
   align-items: center;
   justify-content: flex-start;
   gap: 8px;
   min-width: max(calc(121 * var(--u)), 104px);
-  height: max(calc(50 * var(--u)), 46px);
+  height: max(calc(42 * var(--u)), 42px);
   padding: 0 max(calc(12 * var(--u)), 12px);
   border: 2px solid var(--ete-field);
   border-radius: max(calc(12 * var(--u)), 10px);
@@ -633,8 +631,8 @@ html:not(.js) .ete-envelope { display: none; }
   justify-content: center;
   gap: 10px;
   width: min(calc(511 * var(--u)), 100%);
-  min-height: max(calc(54 * var(--u)), 50px);
-  margin-top: max(calc(32 * var(--u)), 24px);
+  min-height: max(calc(46 * var(--u)), 46px);
+  margin-top: max(calc(16 * var(--u)), 14px);
   padding: 10px 20px;
   border-radius: max(calc(12 * var(--u)), 10px);
   background: var(--ete-small);
@@ -662,7 +660,7 @@ html:not(.js) .ete-envelope { display: none; }
 .ete-rsvp__error { font-style: normal; font-size: 1rem; color: #9B3D2E; }
 
 /* ------------------------------------------------------------------ footer */
-.ete-footer { scroll-snap-align: end; display: grid; justify-items: center; gap: 16px; padding: 24px 16px 56px; text-align: center; }
+.ete-footer { display: grid; justify-items: center; gap: 16px; padding: 24px 16px 56px; text-align: center; }
 .ete-footer__names { font-size: 3.2rem; line-height: 1; color: var(--ete-title); }
 .ete-footer__closing { font-size: 1.2rem; font-style: italic; color: var(--ete-small); }
 .ete-footer__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }

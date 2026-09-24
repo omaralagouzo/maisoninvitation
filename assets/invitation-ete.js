@@ -379,7 +379,7 @@
       if (!reduceMotion.matches) {
         const top = page.getBoundingClientRect().top;
         const vh = window.innerHeight || document.documentElement.clientHeight;
-        p = clamp(1 - top / (vh * 0.85));
+        p = clamp(1 - top / vh);
       }
       const index = Math.round(p * (steps - 1));
       if (index !== lastIndex) {
@@ -422,42 +422,72 @@
   }
 
   /* ---------------------------------------------------------------- pages
-     Each section is a page (CSS scroll snapping; swipes on phones snap natively). With a
-     mouse wheel or trackpad, a short scroll is read as "next page" and glides there, instead
-     of having to drag past the halfway point. Inside a page taller than the screen (the RSVP
-     form on small screens) the wheel scrolls normally until its end. */
+     Each section is a page. A short scroll, swipe or key press glides slowly to the next
+     (or previous) page; the fan opens across that glide. Inside a page taller than the
+     screen (the RSVP form on some screens) you scroll normally until its end. */
   const pages = [...root.querySelectorAll('.ete-slide, .ete-footer')];
   const html = document.documentElement;
   if (pages.length && !html.classList.contains('inv-embed')) {
-    const INTENT = 40; // px of wheel movement that means "go to the next page"
+    const DURATION = 1400; // ms per page change
+    const INTENT = 40; // px of wheel / finger movement that means "next page"
+    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    let animating = false;
     let quietUntil = 0;
     let pending = 0;
     let resetPending = 0;
-    const pageAt = () => pages.find((el) => {
-      const r = el.getBoundingClientRect();
-      return r.top <= 2 && r.bottom > 2;
-    }) || pages[0];
+
+    const pageAt = () =>
+      pages.find((el) => {
+        const r = el.getBoundingClientRect();
+        return r.top <= 2 && r.bottom > 2;
+      }) || pages[0];
+    // Can the current page itself still scroll in this direction (taller than the screen)?
+    const inside = (dir) => {
+      const r = pageAt().getBoundingClientRect();
+      return (dir > 0 && r.bottom > window.innerHeight + 2) || (dir < 0 && r.top < -2);
+    };
+    const glide = (target) => {
+      const start = window.scrollY;
+      const distance = target - start;
+      if (Math.abs(distance) < 2) return;
+      if (reduceMotion.matches) {
+        window.scrollTo({ top: target, behavior: 'instant' });
+        return;
+      }
+      animating = true;
+      const t0 = performance.now();
+      const step = (now) => {
+        const k = Math.min(1, (now - t0) / DURATION);
+        window.scrollTo({ top: start + distance * ease(k), behavior: 'instant' });
+        if (k < 1) requestAnimationFrame(step);
+        else {
+          animating = false;
+          quietUntil = performance.now() + 250; // let trackpad momentum die down
+        }
+      };
+      requestAnimationFrame(step);
+    };
     const go = (dir) => {
+      if (animating) return;
       const y = window.scrollY;
       const max = html.scrollHeight - window.innerHeight;
       const tops = pages.map((el) => Math.min(max, Math.round(el.getBoundingClientRect().top + y)));
       const target = dir > 0 ? tops.find((t) => t > y + 2) : [...tops].reverse().find((t) => t < y - 2);
-      if (target === undefined) return;
-      window.scrollTo({ top: target, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
-      quietUntil = performance.now() + 750;
+      if (target !== undefined) glide(target);
     };
+    const blocked = () => html.classList.contains('inv-locked');
+
+    // Mouse wheel / trackpad
     window.addEventListener(
       'wheel',
       (e) => {
-        if (e.ctrlKey || html.classList.contains('inv-locked') || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+        if (e.ctrlKey || blocked() || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
         const dir = Math.sign(e.deltaY);
         if (!dir) return;
         const now = performance.now();
-        const r = pageAt().getBoundingClientRect();
-        if (now >= quietUntil && ((dir > 0 && r.bottom > window.innerHeight + 2) || (dir < 0 && r.top < -2))) return;
+        if (!animating && now >= quietUntil && inside(dir)) return;
         e.preventDefault();
-        // Swallow the rest of a gesture (trackpad momentum) while a page change is under way.
-        if (now < quietUntil) {
+        if (animating || now < quietUntil) {
           quietUntil = Math.max(quietUntil, now + 160);
           return;
         }
@@ -471,6 +501,48 @@
       },
       { passive: false },
     );
+
+    // Touch: a swipe past the threshold changes page when the finger lifts.
+    let touchY = null;
+    let touchNative = false;
+    const ownGesture = (el) => el.closest?.('.ete-scratch__cover, input, textarea, select');
+    window.addEventListener(
+      'touchstart',
+      (e) => {
+        touchY = e.touches.length === 1 && !blocked() && !ownGesture(e.target) ? e.touches[0].clientY : null;
+        touchNative = false;
+      },
+      { passive: true },
+    );
+    window.addEventListener(
+      'touchmove',
+      (e) => {
+        if (touchY === null) return;
+        const dy = touchY - e.touches[0].clientY;
+        if (!animating && (touchNative || (Math.abs(dy) > 4 && inside(Math.sign(dy))))) {
+          touchNative = true; // scrolling within a tall page
+          return;
+        }
+        if (e.cancelable) e.preventDefault();
+      },
+      { passive: false },
+    );
+    window.addEventListener('touchend', (e) => {
+      if (touchY === null || touchNative) return;
+      const dy = touchY - e.changedTouches[0].clientY;
+      touchY = null;
+      if (Math.abs(dy) >= INTENT) go(Math.sign(dy));
+    });
+
+    // Keyboard (not while typing in the form)
+    window.addEventListener('keydown', (e) => {
+      if (blocked() || e.altKey || e.ctrlKey || e.metaKey || e.target.closest?.('input, textarea, select, [contenteditable]')) return;
+      const dir = { PageDown: 1, ArrowDown: 1, ' ': e.shiftKey ? -1 : 1, PageUp: -1, ArrowUp: -1 }[e.key];
+      if (!dir) return;
+      if (!animating && inside(dir)) return;
+      e.preventDefault();
+      go(dir);
+    });
   }
 
   /* ---------------------------------------------------------------- RSVP companions */
